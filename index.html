@@ -45,6 +45,10 @@ input,select{width:100%;padding:10px 14px;border-radius:14px;border:2px solid va
 .zm{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:9}.zm img{max-width:94%;max-height:90%;border-radius:16px}
 .up{display:inline-block;background:var(--soft);padding:8px 14px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer}
 .done{opacity:.6}.done .tt{text-decoration:line-through}
+.tw{overflow-x:auto;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--soft);text-align:left;padding:8px;font-size:13px;white-space:nowrap}
+td{padding:8px;border-top:1px solid var(--line);vertical-align:top}
 </style></head><body><div class="w"><h1 id="ttl">🎀 Who's Most Likely To 🎀</h1><div id="app" style="text-align:center" class="m">Loading… 🌸</div></div>
 
 <script>
@@ -70,7 +74,7 @@ function menuHTML(){
 <button class="mi" onclick="page='content';render()"><b>💡 Content Ideas</b><div>${dn}/${CI.length} udah dibuat</div></button></div>`}
 /* ---- Rundown ---- */
 let RD=JSON.parse(localStorage.getItem("rd")||"null")||{days:[{id:"d1",label:"Hari 1",start:"09:00",items:[]}]};
-function saveRD(){localStorage.setItem("rd",JSON.stringify(RD));render()}
+function saveRD(){localStorage.setItem("rd",JSON.stringify(RD));if(!LOCAL)post({action:"setBoard",key:KEY,rundown:RD}).catch(e=>alert("Gagal sync: "+e.message));render()}
 const hm=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
 const setDay=(i,k,v)=>{RD.days[i][k]=v;saveRD()};
 const addDay=()=>{RD.days.push({id:"d"+Date.now(),label:"Hari "+(RD.days.length+1),start:"09:00",items:[]});saveRD()};
@@ -79,31 +83,51 @@ const addItem=i=>{RD.days[i].items.push({id:"i"+Date.now(),t:"",dur:60,note:""})
 const setItem=(i,j,k,v)=>{RD.days[i].items[j][k]=k==="dur"?Math.max(0,parseInt(v)||0):v;saveRD()};
 const mvItem=(i,j,d)=>{const a=RD.days[i].items,k=j+d;if(k<0||k>=a.length)return;[a[j],a[k]]=[a[k],a[j]];saveRD()};
 const delItem=(i,j)=>{RD.days[i].items.splice(j,1);saveRD()};
-function rundownHTML(){
- return back+RD.days.map((d,i)=>{const [h,m]=(d.start||"00:00").split(":").map(Number);let cur=h*60+m;
+function rdEdit(){
+ return RD.days.map((d,i)=>{const [h,m]=(d.start||"00:00").split(":").map(Number);let cur=h*60+m;
   const rows=d.items.map((it,j)=>{const st=cur;cur+=it.dur;return `<div class="rd"><div class="row"><span class="tm">${hm(st)}–${hm(cur)}</span><input class="nm" type="number" min="0" step="5" value="${it.dur}" onchange="setItem(${i},${j},'dur',this.value)"><span class="m">mnt</span><span style="flex:1"></span><button class="ic" onclick="mvItem(${i},${j},-1)">↑</button><button class="ic" onclick="mvItem(${i},${j},1)">↓</button><button class="ic" onclick="delItem(${i},${j})">🗑</button></div><input placeholder="Kegiatan…" value="${esc(it.t)}" onchange="setItem(${i},${j},'t',this.value)"><input placeholder="Catatan (opsional)" value="${esc(it.note)}" onchange="setItem(${i},${j},'note',this.value)"></div>`}).join("");
   return `<div class="card"><div class="row"><input value="${esc(d.label)}" onchange="setDay(${i},'label',this.value)"><button class="ic" onclick="delDay(${i})">🗑</button></div><div class="row m">Mulai jam <input type="time" style="width:auto" value="${esc(d.start)}" onchange="setDay(${i},'start',this.value)"></div>${rows}<div class="row" style="margin-top:10px"><button class="btn g" onclick="addItem(${i})">+ Kegiatan</button><span class="m">${d.items.length?"Selesai ±"+hm(cur):""}</span></div></div>`}).join("")+`<button class="btn" style="width:100%" onclick="addDay()">+ Tambah hari</button><p class="m" style="text-align:center">Jam otomatis dihitung dari jam mulai + durasi tiap kegiatan 🌸</p>`}
 /* ---- Content ideas ---- */
 let CI=JSON.parse(localStorage.getItem("ci")||"[]"),cf="all",zm="";
-function saveCI(){try{localStorage.setItem("ci",JSON.stringify(CI))}catch(e){alert("Penyimpanan browser penuh, hapus beberapa foto dulu ya");return false}render();return true}
+function saveCI(){try{localStorage.setItem("ci",JSON.stringify(CI))}catch(e){alert("Penyimpanan browser penuh, hapus beberapa foto dulu ya");return false}if(!LOCAL)post({action:"setBoard",key:KEY,content:CI}).catch(e=>alert("Gagal sync: "+e.message));render();return true}
 const ci=id=>CI.find(x=>x.id===id);
 const setCI=(id,k,v)=>{ci(id)[k]=v;saveCI()};
 function addIdea(){const t=$("#nt").value.trim();if(!t)return;CI.unshift({id:"c"+Date.now(),title:t,link:$("#nl").value.trim(),note:"",done:false,photos:[]});saveCI()}
 const delIdea=id=>{if(confirm("Hapus ide ini?")){CI=CI.filter(x=>x.id!==id);saveCI()}};
 const delPh=(id,k)=>{ci(id).photos.splice(k,1);saveCI()};
 const zoom=(id,k)=>{zm=ci(id).photos[k];render()};
-function addPhotos(id,files){[...files].forEach(f=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const sc=Math.min(1,720/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*sc;c.height=im.height*sc;c.getContext("2d").drawImage(im,0,0,c.width,c.height);const o=ci(id);if(!o)return;o.photos.push(c.toDataURL("image/jpeg",.6));if(!saveCI())o.photos.pop()};im.src=r.result};r.readAsDataURL(f)})}
+let upl=0;
+function addPhotos(id,files){[...files].forEach(f=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=async()=>{const sc=Math.min(1,720/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*sc;c.height=im.height*sc;c.getContext("2d").drawImage(im,0,0,c.width,c.height);const u=c.toDataURL("image/jpeg",.6);
+ if(LOCAL){const o=ci(id);if(!o)return;o.photos.push(u);if(!saveCI())o.photos.pop();return}
+ upl++;render();try{const x=await post({action:"uploadPhoto",key:KEY,data:u.split(",")[1]});const o=ci(id);if(o)o.photos.push(x.url)}catch(e){alert("Upload gagal: "+e.message)}upl--;saveCI()};im.src=r.result};r.readAsDataURL(f)})}
 const lnk=l=>/^https?:\/\//i.test(l)?l:"https://"+l;
-function contentHTML(){
+function cEdit(){
  const list=CI.filter(x=>cf==="all"||(cf==="done")===x.done);
- return back+`<div class="card"><input id="nt" placeholder="Judul ide konten…" onkeydown="if(event.key==='Enter')addIdea()"><input id="nl" placeholder="Link referensi (opsional)" onkeydown="if(event.key==='Enter')addIdea()"><button class="btn" style="margin-top:6px" onclick="addIdea()">+ Tambah ide</button></div>
+ return `<div class="card"><input id="nt" placeholder="Judul ide konten…" onkeydown="if(event.key==='Enter')addIdea()"><input id="nl" placeholder="Link referensi (opsional)" onkeydown="if(event.key==='Enter')addIdea()"><button class="btn" style="margin-top:6px" onclick="addIdea()">+ Tambah ide</button></div>
 <div class="tabs">${[["all","Semua"],["todo","Belum"],["done","Udah ✓"]].map(([k,l])=>`<button class="tab ${cf==k?"on":""}" onclick="cf='${k}';render()">${l}</button>`).join("")}</div>
 ${list.length?list.map(x=>`<div class="card ${x.done?"done":""}"><label class="row" style="font-weight:700"><input type="checkbox" style="width:22px;height:22px;margin:0" ${x.done?"checked":""} onchange="setCI('${x.id}','done',this.checked)"><span class="tt" style="flex:1">${esc(x.title)}</span><button class="ic" type="button" onclick="event.preventDefault();delIdea('${x.id}')">🗑</button></label>
 <input placeholder="Link" value="${esc(x.link)}" onchange="setCI('${x.id}','link',this.value.trim())">${x.link?`<a href="${esc(lnk(x.link))}" target="_blank" rel="noopener" class="m">🔗 buka link</a>`:""}
 <input placeholder="Catatan" value="${esc(x.note)}" onchange="setCI('${x.id}','note',this.value)">
 ${x.photos.length?`<div class="ph">${x.photos.map((u,k)=>`<div><img src="${u}" onclick="zoom('${x.id}',${k})"><button onclick="delPh('${x.id}',${k})">✕</button></div>`).join("")}</div>`:""}
 <label class="up">📷 Tambah foto<input type="file" accept="image/*" multiple hidden onchange="addPhotos('${x.id}',this.files);this.value=''"></label></div>`).join(""):`<div class="card">Belum ada ide di sini 🌸</div>`}
-<p class="m" style="text-align:center">${CI.filter(x=>x.done).length}/${CI.length} udah dibuat</p>`+(zm?`<div class="zm" onclick="zm='';render()"><img src="${zm}"></div>`:"")}
+<p class="m" style="text-align:center">${CI.filter(x=>x.done).length}/${CI.length} udah dibuat</p>`}
+let rv=RD.days.some(d=>d.items.length)?"tbl":"edit",cv=CI.length?"tbl":"edit";
+const sw=(v,n)=>`<div class="tabs" style="margin-bottom:8px"><button class="tab ${v=="tbl"?"on":""}" onclick="${n}='tbl';render()">📊 Tabel</button><button class="tab ${v=="edit"?"on":""}" onclick="${n}='edit';render()">✏️ Edit</button></div>`;
+function rdTable(){
+ if(!RD.days.some(d=>d.items.length))return `<div class="card">Belum ada kegiatan 🌸${isOwner?" Klik ✏️ Edit buat nambah.":""}</div>`;
+ return RD.days.filter(d=>d.items.length).map(d=>{const [h,m]=(d.start||"00:00").split(":").map(Number);let cur=h*60+m;
+  const rows=d.items.map(it=>{const st=cur;cur+=it.dur;return `<tr><td><span class="tm">${hm(st)}–${hm(cur)}</span></td><td><b>${esc(it.t||"(tanpa judul)")}</b></td><td style="white-space:nowrap">${it.dur} mnt</td><td class="m">${esc(it.note)}</td></tr>`}).join("");
+  return `<div class="card"><b>${esc(d.label)}</b> <span class="m">· mulai ${esc(d.start)} · selesai ±${hm(cur)}</span><div class="tw"><table><tr><th>Jam</th><th>Kegiatan</th><th>Durasi</th><th>Catatan</th></tr>${rows}</table></div></div>`}).join("")}
+function cTable(){
+ const list=CI.filter(x=>cf==="all"||(cf==="done")===x.done);
+ const flt=`<div class="tabs">${[["all","Semua"],["todo","Belum"],["done","Udah ✓"]].map(([k,l])=>`<button class="tab ${cf==k?"on":""}" onclick="cf='${k}';render()">${l}</button>`).join("")}</div>`;
+ if(!list.length)return flt+`<div class="card">Belum ada ide di sini 🌸${isOwner?" Klik ✏️ Edit buat nambah.":""}</div>`;
+ return flt+`<div class="card"><div class="tw"><table><tr><th>✓</th><th>Ide</th><th>Link</th><th>Catatan</th><th>Foto</th></tr>${list.map(x=>`<tr class="${x.done?"done":""}"><td><input type="checkbox" style="width:22px;height:22px;margin:0" ${x.done?"checked":""} onchange="setCI('${x.id}','done',this.checked)" ${isOwner?"":"disabled"}></td><td class="tt"><b>${esc(x.title)}</b></td><td>${x.link?`<a href="${esc(lnk(x.link))}" target="_blank" rel="noopener">🔗 buka</a>`:"—"}</td><td class="m">${esc(x.note)}</td><td style="white-space:nowrap">${x.photos.slice(0,3).map((u,k)=>`<img src="${u}" style="width:38px;height:38px;object-fit:cover;border-radius:8px;cursor:zoom-in;margin-right:3px" onclick="zoom('${x.id}',${k})">`).join("")}${x.photos.length>3?`<span class="m">+${x.photos.length-3}</span>`:""}</td></tr>`).join("")}</table></div></div><p class="m" style="text-align:center">${CI.filter(x=>x.done).length}/${CI.length} udah dibuat</p>`}
+const rundownHTML=()=>back+sw(rv,"rv")+(rv==="tbl"?rdTable():rdEdit());
+const contentHTML=()=>back+sw(cv,"cv")+(upl?`<p class="m" style="text-align:center">⏳ Mengunggah ${upl} foto…</p>`:"")+(cv==="tbl"?cTable():cEdit())+zmHTML();
+const zmHTML=()=>zm?`<div class="zm" onclick="zm='';render()"><img src="${zm}"></div>`:"";
+async function loadBoard(){const b=await api("action=board");if(b.rundown&&b.rundown.days)RD=b.rundown;if(Array.isArray(b.content)&&(b.content.length||!CI.length))CI=b.content}
+const setViews=()=>{rv=RD.days.some(d=>d.items.length)?"tbl":"edit";cv=CI.length?"tbl":"edit"};
 function render(){
  if(isOwner&&page!=="quiz"){setTtl(page);app().innerHTML=({menu:menuHTML,rundown:rundownHTML,content:contentHTML})[page]()+(LOCAL?"":`<button class="lock" onclick="logout()">keluar 🔒</button>`);return}
  if(isOwner){setTtl("quiz");const T=["✏️ Pertanyaan","🔗 Share","📄 Jawaban","🎰 Hasil","✨ Summary",...(LOCAL?["📝 Isi Form"]:[])];
@@ -114,11 +138,12 @@ function render(){
 function lockBtn(){return `<button class="lock" onclick="showLogin=true;render()">🔒</button>`}
 const api=q=>fetch(API+"?"+q).then(r=>r.json());
 const post=async d=>{const r=await(await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(d)})).json();if(r.error)throw new Error(r.error);return r};
-async function login(){const k=$("#pw").value;const r=await api("action=responses&key="+encodeURIComponent(k)).catch(()=>({error:"net"}));if(r.error)return alert("Password salah / koneksi gagal");KEY=k;sessionStorage.setItem("wk",k);isOwner=true;showLogin=false;resp=r.responses;render()}
-function logout(){KEY="";sessionStorage.removeItem("wk");isOwner=false;render()}
+async function login(){const k=$("#pw").value;const r=await api("action=responses&key="+encodeURIComponent(k)).catch(()=>({error:"net"}));if(r.error)return alert("Password salah / koneksi gagal");KEY=k;sessionStorage.setItem("wk",k);isOwner=true;showLogin=false;resp=r.responses;await loadBoard().catch(()=>{});setViews();page="menu";render()}
+function logout(){page="menu";KEY="";sessionStorage.removeItem("wk");isOwner=false;render()}
 function save(list){if(LOCAL){qs=list.map(q=>({id:q.id,text:q.text}));localStorage.setItem("wq",JSON.stringify(qs));render();return}qs=list.map(q=>({id:q.id,text:q.text}));render();return post({action:"setQuestions",key:KEY,questions:qs}).catch(e=>alert("Gagal simpan: "+e.message))}
 async function pull(){try{const a=document.activeElement,typing=a&&a.tagName==="INPUT";let ch=!inited;
  const q=await api("action=questions");if(JSON.stringify(q.questions)!==JSON.stringify(qs.map(x=>({id:x.id,text:x.text})))){qs=q.questions;ch=true}
+ if(!isOwner){const a0=JSON.stringify([RD,CI]);await loadBoard();if(a0!==JSON.stringify([RD,CI]))ch=true}
  if(isOwner){const r=await api("action=responses&key="+encodeURIComponent(KEY));if(r.responses&&JSON.stringify(r.responses)!==JSON.stringify(resp)){resp=r.responses;ch=true}}
  if(ch&&!typing){inited=true;render()}}catch(e){if(!inited){inited=true;render()}}}
 function tabQ(){return `<div class="card"><b>Pilihan jawaban (fix):</b> <span class="m">${NAMES.join(" · ")}</span><div class="row" style="margin-top:8px"><input id="nq" placeholder="Siapa yang paling mungkin…" onkeydown="if(event.key==='Enter')addQ()"><button class="btn" onclick="addQ()">Tambah</button></div></div>
@@ -174,7 +199,8 @@ function copyPrompt(){
  const data=qs.map(q=>({pertanyaan:q.text,vote:tally(q.id)}));
  const p=`Kamu bikin summary lucu untuk 4 sahabat: ${NAMES.join(", ")}. Ini hasil voting "who's most likely to" (jumlah vote per nama per pertanyaan): ${JSON.stringify(data)}. Tulis dalam bahasa Indonesia santai, hangat, sedikit savage tapi sayang: 2-3 kalimat kepribadian tiap orang berdasarkan pola vote, plus 4-5 fun fact (siapa paling sering ditunjuk, hasil paling mengejutkan, vote paling mepet).`;
  navigator.clipboard.writeText(p).then(()=>{copied=true;render();setTimeout(()=>{copied=false;render()},2000)},()=>prompt("Salin manual:",p))}
-function renderGuest(){setTtl("quiz");app().innerHTML=guestHTML()+lockBtn()}
+function renderGuest(){setTtl(page==="menu"?"quiz":page);const nav=`<div class="tabs" style="margin-bottom:10px">${[["menu","📝 Form"],["rundown","🗓 Rundown"],["content","💡 Ide Konten"]].map(([k,l])=>`<button class="tab ${page==k?"on":""}" onclick="page='${k}';render()">${l}</button>`).join("")}</div>`;
+ app().innerHTML=nav+(page==="rundown"?rdTable():page==="content"?cTable()+zmHTML():guestHTML())+lockBtn()}
 let step=0;
 function setWho(x){mine.who=x;render();setTimeout(()=>{if(step===0){step=1;render();scrollTo(0,0)}},220)}
 function pick(q,n){mine.ans[q]=n;render();const s0=step;setTimeout(()=>{if(step===s0){step++;render();scrollTo(0,0)}},220)}
@@ -191,5 +217,5 @@ async function submit(){
  const m=qs.findIndex(q=>!mine.ans[q.id]);if(m>=0){step=m+1;render();return alert("Ada yang belum dijawab")}
  try{if(LOCAL){const r=JSON.parse(localStorage.getItem("wr")||"{}");r[mine.who]={who:mine.who,ans:mine.ans,ts:Date.now()};localStorage.setItem("wr",JSON.stringify(r));resp=Object.values(r)}else await post({action:"submit",who:mine.who,ans:mine.ans});done=true;render();scrollTo(0,0)}catch(e){alert("Gagal kirim: "+e.message)}}
 if(LOCAL){isOwner=true;qs=JSON.parse(localStorage.getItem("wq")||"[]");resp=Object.values(JSON.parse(localStorage.getItem("wr")||"{}"));render()}
-else(async()=>{if(KEY){const r=await api("action=responses&key="+encodeURIComponent(KEY)).catch(()=>({}));isOwner=!!r.responses;if(isOwner)resp=r.responses}await pull();render();setInterval(pull,8000)})();
+else(async()=>{if(KEY){const r=await api("action=responses&key="+encodeURIComponent(KEY)).catch(()=>({}));isOwner=!!r.responses;if(isOwner){resp=r.responses;await loadBoard().catch(()=>{});setViews()}}await pull();render();setInterval(pull,8000)})();
 </script></body></html>
