@@ -254,7 +254,7 @@
 
     <script>
         // ====== ISI: URL Web App dari Apps Script ======
-        const API = "https://script.google.com/macros/s/AKfycbwR-1T3jQutzVarJmxDWuuxz6k9kWlw_qovBijV18q4nBxyFbZOPySibCCqW5E_tq8/exec";
+        const API = "https://script.google.com/macros/s/AKfycbwmN1wMzMxWvtUOcPshViTvmAeX3kOGZE1uWTE2YERvWlt9WHLg8tAE1iNed6SG8C0/exec";
         // ===============================================
         const LOCAL = API.startsWith("PASTE");
         const NAMES = ["Ocha", "Jiji", "Rara", "Wini"];
@@ -268,8 +268,8 @@
         function bars(t) { const mx = Math.max(1, ...Object.values(t)); return `<div class="rs">${NAMES.map(n => `<div class="row"><span>${n}</span><div class="bar"><i style="width:${t[n] / mx * 100}%"></i></div><b>${t[n]}</b></div>`).join("")}</div>` }
         function render() {
             if (isOwner) {
-                const T = ["✏️ Pertanyaan", "🔗 Share", "🎰 Hasil", "✨ Summary", ...(LOCAL ? ["📝 Isi Form"] : [])];
-                app().innerHTML = `<div class="tabs">${T.map((t, i) => `<button class="tab ${tab == i ? "on" : ""}" onclick="tab=${i};render()">${t}</button>`).join("")}</div>` + [tabQ, tabShare, tabSlides, tabSum, guestHTML][tab]() + (LOCAL ? "" : `<button class="lock" onclick="logout()">keluar 🔒</button>`); return
+                const T = ["✏️ Pertanyaan", "🔗 Share", "📄 Jawaban", "🎰 Hasil", "✨ Summary", ...(LOCAL ? ["📝 Isi Form"] : [])];
+                app().innerHTML = `<div class="tabs">${T.map((t, i) => `<button class="tab ${tab == i ? "on" : ""}" onclick="tab=${i};render()">${t}</button>`).join("")}</div>` + [tabQ, tabShare, tabAns, tabSlides, tabSum, guestHTML][tab]() + (LOCAL ? "" : `<button class="lock" onclick="logout()">keluar 🔒</button>`); return
             }
             if (showLogin) { app().innerHTML = `<div class="card"><b>Login admin 🔒</b><input id="pw" type="password" placeholder="password admin" onkeydown="if(event.key==='Enter')login()"><div class="row" style="margin-top:8px"><button class="btn" onclick="login()">Masuk</button><button class="btn g" onclick="showLogin=false;render()">Batal</button></div></div>`; return }
             renderGuest();
@@ -295,9 +295,22 @@
         function addQ() { const v = $("#nq").value.trim(); if (v) save([...qs, { id: "q" + Date.now(), text: v }]) }
         function delQ(i) { if (confirm("Hapus pertanyaan ini?")) save(qs.filter((_, j) => j !== i)) }
         function seed() { save(SAMPLE.map((t, i) => ({ id: "q" + Date.now() + i, text: t }))) }
-        function wipe() { if (confirm("Hapus semua jawaban?")) { localStorage.removeItem("wr"); resp = []; revealed = {}; render() } }
+        let vw = "";
+        async function delResp(who) {
+            if (!confirm(who ? `Hapus jawaban ${who}?` : "Hapus SEMUA jawaban?")) return;
+            if (LOCAL) { const r = JSON.parse(localStorage.getItem("wr") || "{}"); if (who) delete r[who]; else Object.keys(r).forEach(k => delete r[k]); localStorage.setItem("wr", JSON.stringify(r)); resp = Object.values(r) }
+            else { try { await post({ action: "deleteResponses", key: KEY, who: who || null }); resp = who ? resp.filter(r => r.who !== who) : [] } catch (e) { return alert("Gagal hapus: " + e.message) } }
+            revealed = {}; render()
+        }
+        function tabAns() {
+            if (!resp.length) return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
+            if (!vw) vw = resp[0].who;
+            const r = resp.find(x => x.who == vw);
+            return `<div class="tabs" style="margin-top:12px">${NAMES.map(n => `<button class="tab ${vw == n ? "on" : ""}" style="${resp.some(x => x.who == n) ? "" : "opacity:.45"}" onclick="vw='${n}';render()">${n}</button>`).join("")}</div>
+<div class="card"><b>📄 Kertas jawaban ${vw}</b>${r ? qs.map((q, i) => `<div class="q">${i + 1}. ${esc(q.text)}<br><b style="color:var(--p2)">→ ${esc(r.ans[q.id] || "—")}</b></div>`).join("") + `<button class="btn g" style="margin-top:10px" onclick="delResp('${vw}')">🗑 Hapus jawaban ${vw}</button>` : `<p class="m">${vw} belum ngisi ⏳</p>`}</div>
+<button class="btn g" style="width:100%" onclick="delResp()">🗑 Hapus SEMUA jawaban</button>`}
         function tabShare() {
-            if (LOCAL) return `<div class="card"><b>Mode lokal 🌸</b><p class="m">Data cuma tersimpan di browser ini (belum sync antar device). Sync dipasang nanti.</p></div><div class="card"><b>Status pengisian</b>${NAMES.map(n => `<div class="q">${resp.some(r => r.who == n) ? "✅" : "⏳"} ${n}</div>`).join("")}<button class="btn g" style="margin-top:10px" onclick="wipe()">Hapus semua jawaban (test)</button></div>`; const url = location.href.split("#")[0]; return `<div class="card"><b>Link buat temen 💌</b><input readonly value="${esc(url)}" onclick="this.select()"><p class="m">Kirim link ini. Temen cuma lihat form, tanpa login. Jawaban cuma kebaca kalau kamu login admin.</p></div>
+            if (LOCAL) return `<div class="card"><b>Mode lokal 🌸</b><p class="m">Data cuma tersimpan di browser ini (belum sync antar device). Sync dipasang nanti.</p></div><div class="card"><b>Status pengisian</b>${NAMES.map(n => `<div class="q">${resp.some(r => r.who == n) ? "✅" : "⏳"} ${n}</div>`).join("")}<button class="btn g" style="margin-top:10px" onclick="delResp()">Hapus semua jawaban (test)</button></div>`; const url = location.href.split("#")[0]; return `<div class="card"><b>Link buat temen 💌</b><input readonly value="${esc(url)}" onclick="this.select()"><p class="m">Kirim link ini. Temen cuma lihat form, tanpa login. Jawaban cuma kebaca kalau kamu login admin.</p></div>
 <div class="card"><b>Status pengisian</b>${NAMES.map(n => `<div class="q">${resp.some(r => r.who == n) ? "✅" : "⏳"} ${n}</div>`).join("")}</div>`
         }
         function tabSlides() {
@@ -314,10 +327,23 @@
         function spin(id) { spinning = id; render(); let k = 0; const iv = setInterval(() => { const e = $("#sp"); if (e) e.textContent = NAMES[k++ % 4]; if (k > 26) { clearInterval(iv); spinning = null; revealed[id] = true; render() } }, 45) }
         function topQs(n) { return qs.map(q => [q.text, tally(q.id)[n]]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3) }
         function short(t) { return esc(t.replace(/^Siapa yang paling mungkin /, "").replace(/\?$/, "")) }
+        const EM = { Ocha: "🌸", Jiji: "🎀", Rara: "🍓", Wini: "🦋" };
+        function badge(q) { const m = q.text.match(/paling (mungkin )?(.*?)\??$/i); return m ? `Si Paling ${m[1] ? "Mungkin " : ""}${m[2]}` : q.text }
         function tabSum() {
-            const t = totals(), o = [...NAMES].sort((a, b) => t[b] - t[a]);
-            return `<div class="card"><b>Total kena tunjuk</b>${bars(t)}<p class="m">👑 Paling sering ditunjuk: <b>${o[0]}</b> (${t[o[0]]}×) · 🕊 Paling jarang: <b>${o[3]}</b> (${t[o[3]]}×)</p></div>
-<div class="card"><b>Gelar tiap orang ✨</b>${NAMES.map(n => `<div class="q"><b>${n}</b><div class="m">${topQs(n).map(x => `${short(x[0])} (${x[1]}×)`).join("<br>") || "belum ada"}</div></div>`).join("")}</div>
+            if (!resp.length || !qs.length) return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
+            const t = totals(), o = [...NAMES].sort((a, b) => t[b] - t[a]), V = resp.length;
+            const info = qs.map(q => { const x = tally(q.id), mx = Math.max(...Object.values(x)); return { q, mx, w: NAMES.filter(n => x[n] == mx && mx > 0) } });
+            const aw = {}; NAMES.forEach(n => aw[n] = info.filter(i => i.w.length == 1 && i.w[0] == n).sort((a, b) => b.mx - a.mx).slice(0, 3));
+            const self = NAMES.filter(n => resp.some(r => r.who == n)).map(n => { const r = resp.find(x => x.who == n); return [n, qs.filter(q => r.ans[q.id] == n).length] }).sort((a, b) => b[1] - a[1]);
+            const kompak = [...info].sort((a, b) => b.mx - a.mx)[0], debat = [...info].sort((a, b) => a.mx - b.mx)[0];
+            const fav = resp.map(r => { const c = {}; qs.forEach(q => { const a = r.ans[q.id]; if (a && a != r.who) c[a] = (c[a] || 0) + 1 }); const e = Object.entries(c).sort((a, b) => b[1] - a[1])[0]; return e ? `${EM[r.who] || ""} ${r.who} paling sering nunjuk <b>${e[0]}</b> (${e[1]}×)` : "" }).filter(Boolean);
+            return `<div class="slide" style="min-height:0"><div class="m">👑 Si paling kena tunjuk</div><div class="big">${o[0]} ${EM[o[0]]}</div><div class="m">${t[o[0]]} vote dari ${qs.length} pertanyaan · paling jarang: ${o[3]} (${t[o[3]]}×) 🕊</div>${bars(t)}</div>` +
+                NAMES.map(n => `<div class="card"><div class="row"><span style="font-size:34px">${EM[n]}</span><div><b style="font-size:18px">${n}</b><div class="m">${t[n]} kali ditunjuk</div></div></div>${aw[n].length ? aw[n].map(i => `<div class="q">🏅 <b>${esc(badge(i.q))}</b> <span class="m">(${i.mx}/${V} vote)</span></div>`).join("") : `<div class="q m">Belum ada gelar solo, aman 😌</div>`}</div>`).join("") +
+                `<div class="card"><b>🎭 Fun facts</b>
+${self.length ? `<div class="q">🪞 Paling narsis: <b>${self[0][0]}</b> (milih diri sendiri ${self[0][1]}×)</div>` : ""}
+<div class="q">🤝 Paling kompak: <b>${esc(badge(kompak.q))}</b> → ${kompak.w.join(" & ") || "—"} (${kompak.mx}/${V})</div>
+<div class="q">⚔️ Paling bikin debat: <b>${esc(badge(debat.q))}</b> (suara kepecah)</div>
+${fav.length ? `<div class="q">💘 Siapa nunjuk siapa:<br>${fav.join("<br>")}</div>` : ""}</div>
 <div class="card"><b>AI summary 🤖</b><p class="m">Halaman ini nggak bisa panggil AI langsung. Klik tombol, lalu tempel ke Claude/ChatGPT buat dapet summary kepribadian tiap orang.</p><button class="btn" onclick="copyPrompt()">${copied ? "Tersalin ✅" : "Salin prompt"}</button></div>`
         }
         function copyPrompt() {
