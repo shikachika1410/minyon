@@ -1,377 +1,195 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id"><head><meta charset="utf-8"><title>Who's Most Likely To 🎀</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff7fa;--card:#fff;--ink:#7a3b5a;--mut:#c08aa5;--p1:#ffc2da;--p2:#ff9cc4;--soft:#ffe9f2;--line:#ffd9e8}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 20% 0,#ffeaf3,var(--bg) 50%);color:var(--ink);font-family:"Quicksand","Trebuchet MS",system-ui,sans-serif;min-height:100vh}
+.w{max-width:720px;margin:0 auto;padding:18px}
+h1{font-size:24px;margin:8px 0 14px;text-align:center}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.tab{flex:1;white-space:nowrap;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
+.tab.on{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border-color:transparent}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;margin:12px 0;box-shadow:0 6px 18px #ffb6d31f;text-align:left}
+.btn{border:0;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;font:inherit;font-weight:700;padding:10px 18px;border-radius:999px;cursor:pointer}
+.btn.g{background:var(--soft);color:var(--ink)}
+input,select{width:100%;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:#fff;color:var(--ink);font:inherit;margin:4px 0}
+.row{display:flex;gap:8px;align-items:center}
+.q{padding:10px 0;border-bottom:1px dashed var(--line)}.q:last-child{border:0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.opt{border:2px solid var(--line);background:var(--soft);color:var(--ink);border-radius:14px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
+.opt.on{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border-color:transparent}
+.m{color:var(--mut);font-size:14px}
+.bar{height:14px;border-radius:99px;background:var(--soft);overflow:hidden;flex:1}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p1),var(--p2));border-radius:99px;transition:width .6s}
+.slide{min-height:380px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px;background:linear-gradient(160deg,#fff,var(--soft));border:3px solid var(--p1);border-radius:28px;padding:24px}
+.slide h2{font-size:24px;margin:0}
+.big{font-size:54px;font-weight:700;color:var(--p2);animation:pop .5s}
+.spin{font-size:46px;font-weight:700;color:var(--mut)}
+@keyframes pop{0%{transform:scale(.3) rotate(-8deg);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.rs{width:100%;max-width:340px;display:flex;flex-direction:column;gap:6px}
+.rs span:first-child{width:54px;text-align:left;font-weight:700}
+.tx{white-space:pre-wrap;line-height:1.5}
+.lock{display:block;margin:20px auto 0;background:none;border:0;color:var(--mut);cursor:pointer;font:inherit;font-size:13px}
+.menu{display:grid;gap:12px}
+.mi{display:block;width:100%;text-align:left;border:2px solid var(--line);background:linear-gradient(160deg,#fff,var(--soft));border-radius:24px;padding:18px;font:inherit;color:var(--ink);cursor:pointer;box-shadow:0 6px 18px #ffb6d31f}
+.mi b{font-size:19px}.mi div{color:var(--mut);font-size:14px;margin-top:4px}
+.tm{background:var(--soft);border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px;white-space:nowrap}
+.ic{border:0;background:var(--soft);color:var(--ink);border-radius:10px;width:34px;height:34px;font:inherit;cursor:pointer}
+.nm{width:76px!important}
+.rd{border-top:1px dashed var(--line);padding:10px 0}
+.ph{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.ph div{position:relative}.ph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;cursor:zoom-in}
+.ph button{position:absolute;top:3px;right:3px;border:0;border-radius:99px;width:22px;height:22px;background:#fffc;color:var(--ink);cursor:pointer}
+.zm{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:9}.zm img{max-width:94%;max-height:90%;border-radius:16px}
+.up{display:inline-block;background:var(--soft);padding:8px 14px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer}
+.done{opacity:.6}.done .tt{text-decoration:line-through}
+</style></head><body><div class="w"><h1 id="ttl">🎀 Who's Most Likely To 🎀</h1><div id="app" style="text-align:center" class="m">Loading… 🌸</div></div>
 
-<head>
-    <meta charset="utf-8">
-    <title>Who's Most Likely To 🎀</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #fff7fa;
-            --card: #fff;
-            --ink: #7a3b5a;
-            --mut: #c08aa5;
-            --p1: #ffc2da;
-            --p2: #ff9cc4;
-            --soft: #ffe9f2;
-            --line: #ffd9e8
-        }
-
-        * {
-            box-sizing: border-box
-        }
-
-        body {
-            margin: 0;
-            background: radial-gradient(circle at 20% 0, #ffeaf3, var(--bg) 50%);
-            color: var(--ink);
-            font-family: "Quicksand", "Trebuchet MS", system-ui, sans-serif;
-            min-height: 100vh
-        }
-
-        .w {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 18px
-        }
-
-        h1 {
-            font-size: 24px;
-            margin: 8px 0 14px;
-            text-align: center
-        }
-
-        .tabs {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 6px
-        }
-
-        .tab {
-            flex: 1;
-            white-space: nowrap;
-            border: 2px solid var(--line);
-            background: var(--card);
-            color: var(--ink);
-            padding: 9px 12px;
-            border-radius: 999px;
-            font: inherit;
-            font-weight: 700;
-            cursor: pointer
-        }
-
-        .tab.on {
-            background: linear-gradient(135deg, var(--p1), var(--p2));
-            color: #fff;
-            border-color: transparent
-        }
-
-        .card {
-            background: var(--card);
-            border: 2px solid var(--line);
-            border-radius: 22px;
-            padding: 16px;
-            margin: 12px 0;
-            box-shadow: 0 6px 18px #ffb6d31f;
-            text-align: left
-        }
-
-        .btn {
-            border: 0;
-            background: linear-gradient(135deg, var(--p1), var(--p2));
-            color: #fff;
-            font: inherit;
-            font-weight: 700;
-            padding: 10px 18px;
-            border-radius: 999px;
-            cursor: pointer
-        }
-
-        .btn.g {
-            background: var(--soft);
-            color: var(--ink)
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 14px;
-            border: 2px solid var(--line);
-            background: #fff;
-            color: var(--ink);
-            font: inherit;
-            margin: 4px 0
-        }
-
-        .row {
-            display: flex;
-            gap: 8px;
-            align-items: center
-        }
-
-        .q {
-            padding: 10px 0;
-            border-bottom: 1px dashed var(--line)
-        }
-
-        .q:last-child {
-            border: 0
-        }
-
-        .opts {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 8px
-        }
-
-        .opt {
-            border: 2px solid var(--line);
-            background: var(--soft);
-            color: var(--ink);
-            border-radius: 14px;
-            padding: 10px;
-            font: inherit;
-            font-weight: 700;
-            cursor: pointer
-        }
-
-        .opt.on {
-            background: linear-gradient(135deg, var(--p1), var(--p2));
-            color: #fff;
-            border-color: transparent
-        }
-
-        .m {
-            color: var(--mut);
-            font-size: 14px
-        }
-
-        .bar {
-            height: 14px;
-            border-radius: 99px;
-            background: var(--soft);
-            overflow: hidden;
-            flex: 1
-        }
-
-        .bar i {
-            display: block;
-            height: 100%;
-            background: linear-gradient(90deg, var(--p1), var(--p2));
-            border-radius: 99px;
-            transition: width .6s
-        }
-
-        .slide {
-            min-height: 380px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            gap: 14px;
-            background: linear-gradient(160deg, #fff, var(--soft));
-            border: 3px solid var(--p1);
-            border-radius: 28px;
-            padding: 24px
-        }
-
-        .slide h2 {
-            font-size: 24px;
-            margin: 0
-        }
-
-        .big {
-            font-size: 54px;
-            font-weight: 700;
-            color: var(--p2);
-            animation: pop .5s
-        }
-
-        .spin {
-            font-size: 46px;
-            font-weight: 700;
-            color: var(--mut)
-        }
-
-        @keyframes pop {
-            0% {
-                transform: scale(.3) rotate(-8deg);
-                opacity: 0
-            }
-
-            70% {
-                transform: scale(1.2)
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1
-            }
-        }
-
-        .rs {
-            width: 100%;
-            max-width: 340px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px
-        }
-
-        .rs span:first-child {
-            width: 54px;
-            text-align: left;
-            font-weight: 700
-        }
-
-        .tx {
-            white-space: pre-wrap;
-            line-height: 1.5
-        }
-
-        .lock {
-            display: block;
-            margin: 20px auto 0;
-            background: none;
-            border: 0;
-            color: var(--mut);
-            cursor: pointer;
-            font: inherit;
-            font-size: 13px
-        }
-    </style>
-</head>
-
-<body>
-    <div class="w">
-        <h1>🎀 Who's Most Likely To 🎀</h1>
-        <div id="app" style="text-align:center" class="m">Loading… 🌸</div>
-    </div>
-
-    <script>
-        // ====== ISI: URL Web App dari Apps Script ======
-        const API = "https://script.google.com/macros/s/AKfycbwmN1wMzMxWvtUOcPshViTvmAeX3kOGZE1uWTE2YERvWlt9WHLg8tAE1iNed6SG8C0/exec";
-        // ===============================================
-        const LOCAL = API.startsWith("PASTE");
-        const NAMES = ["Ocha", "Jiji", "Rara", "Wini"];
-        const SAMPLE = ["Siapa yang paling mungkin telat datang ke staycation?", "Siapa yang paling mungkin bangun paling siang?", "Siapa yang paling mungkin nikah duluan?", "Siapa yang paling mungkin balikan sama ex?", "Siapa yang paling mungkin survive zombie apocalypse?", "Siapa yang paling mungkin jadi villain kalau kita masuk reality show?", "Siapa yang paling delulu?", "Siapa yang paling mungkin jadi tempat curhat semua orang?", "Siapa yang paling mungkin tiba-tiba pindah negara?", "Siapa yang paling mungkin dateng jam 3 pagi kalau kita butuh bantuan?"];
-        let KEY = sessionStorage.getItem("wk") || "", inited = false, isOwner = false, showLogin = false, qs = [], resp = [], tab = 0, slide = 0, revealed = {}, spinning = null, mine = { who: "", ans: {} }, done = false, copied = false;
-        const $ = s => document.querySelector(s);
-        const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-        const app = () => $("#app");
-        function tally(id) { const t = {}; NAMES.forEach(n => t[n] = 0); resp.forEach(r => { const c = r.ans && r.ans[id]; if (c in t) t[c]++ }); return t }
-        function totals() { const t = {}; NAMES.forEach(n => t[n] = 0); qs.forEach(q => { const x = tally(q.id); NAMES.forEach(n => t[n] += x[n]) }); return t }
-        function bars(t) { const mx = Math.max(1, ...Object.values(t)); return `<div class="rs">${NAMES.map(n => `<div class="row"><span>${n}</span><div class="bar"><i style="width:${t[n] / mx * 100}%"></i></div><b>${t[n]}</b></div>`).join("")}</div>` }
-        function render() {
-            if (isOwner) {
-                const T = ["✏️ Pertanyaan", "🔗 Share", "📄 Jawaban", "🎰 Hasil", "✨ Summary", ...(LOCAL ? ["📝 Isi Form"] : [])];
-                app().innerHTML = `<div class="tabs">${T.map((t, i) => `<button class="tab ${tab == i ? "on" : ""}" onclick="tab=${i};render()">${t}</button>`).join("")}</div>` + [tabQ, tabShare, tabAns, tabSlides, tabSum, guestHTML][tab]() + (LOCAL ? "" : `<button class="lock" onclick="logout()">keluar 🔒</button>`); return
-            }
-            if (showLogin) { app().innerHTML = `<div class="card"><b>Login admin 🔒</b><input id="pw" type="password" placeholder="password admin" onkeydown="if(event.key==='Enter')login()"><div class="row" style="margin-top:8px"><button class="btn" onclick="login()">Masuk</button><button class="btn g" onclick="showLogin=false;render()">Batal</button></div></div>`; return }
-            renderGuest();
-        }
-        function lockBtn() { return `<button class="lock" onclick="showLogin=true;render()">🔒</button>` }
-        const api = q => fetch(API + "?" + q).then(r => r.json());
-        const post = async d => { const r = await (await fetch(API, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(d) })).json(); if (r.error) throw new Error(r.error); return r };
-        async function login() { const k = $("#pw").value; const r = await api("action=responses&key=" + encodeURIComponent(k)).catch(() => ({ error: "net" })); if (r.error) return alert("Password salah / koneksi gagal"); KEY = k; sessionStorage.setItem("wk", k); isOwner = true; showLogin = false; resp = r.responses; render() }
-        function logout() { KEY = ""; sessionStorage.removeItem("wk"); isOwner = false; render() }
-        function save(list) { if (LOCAL) { qs = list.map(q => ({ id: q.id, text: q.text })); localStorage.setItem("wq", JSON.stringify(qs)); render(); return } qs = list.map(q => ({ id: q.id, text: q.text })); render(); return post({ action: "setQuestions", key: KEY, questions: qs }).catch(e => alert("Gagal simpan: " + e.message)) }
-        async function pull() {
-            try {
-                const a = document.activeElement, typing = a && a.tagName === "INPUT"; let ch = !inited;
-                const q = await api("action=questions"); if (JSON.stringify(q.questions) !== JSON.stringify(qs.map(x => ({ id: x.id, text: x.text })))) { qs = q.questions; ch = true }
-                if (isOwner) { const r = await api("action=responses&key=" + encodeURIComponent(KEY)); if (r.responses && JSON.stringify(r.responses) !== JSON.stringify(resp)) { resp = r.responses; ch = true } }
-                if (ch && !typing) { inited = true; render() }
-            } catch (e) { if (!inited) { inited = true; render() } }
-        }
-        function tabQ() {
-            return `<div class="card"><b>Pilihan jawaban (fix):</b> <span class="m">${NAMES.join(" · ")}</span><div class="row" style="margin-top:8px"><input id="nq" placeholder="Siapa yang paling mungkin…" onkeydown="if(event.key==='Enter')addQ()"><button class="btn" onclick="addQ()">Tambah</button></div></div>
-<div class="card">${qs.length ? qs.map((q, i) => `<div class="q row"><span style="flex:1">${i + 1}. ${esc(q.text)}</span><button class="btn g" onclick="delQ(${i})">🗑</button></div>`).join("") : `<p class="m">Belum ada pertanyaan.</p><button class="btn" onclick="seed()">Isi contoh 10 pertanyaan</button>`}</div>`
-        }
-        function addQ() { const v = $("#nq").value.trim(); if (v) save([...qs, { id: "q" + Date.now(), text: v }]) }
-        function delQ(i) { if (confirm("Hapus pertanyaan ini?")) save(qs.filter((_, j) => j !== i)) }
-        function seed() { save(SAMPLE.map((t, i) => ({ id: "q" + Date.now() + i, text: t }))) }
-        let vw = "";
-        async function delResp(who) {
-            if (!confirm(who ? `Hapus jawaban ${who}?` : "Hapus SEMUA jawaban?")) return;
-            if (LOCAL) { const r = JSON.parse(localStorage.getItem("wr") || "{}"); if (who) delete r[who]; else Object.keys(r).forEach(k => delete r[k]); localStorage.setItem("wr", JSON.stringify(r)); resp = Object.values(r) }
-            else { try { await post({ action: "deleteResponses", key: KEY, who: who || null }); resp = who ? resp.filter(r => r.who !== who) : [] } catch (e) { return alert("Gagal hapus: " + e.message) } }
-            revealed = {}; render()
-        }
-        function tabAns() {
-            if (!resp.length) return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
-            if (!vw) vw = resp[0].who;
-            const r = resp.find(x => x.who == vw);
-            return `<div class="tabs" style="margin-top:12px">${NAMES.map(n => `<button class="tab ${vw == n ? "on" : ""}" style="${resp.some(x => x.who == n) ? "" : "opacity:.45"}" onclick="vw='${n}';render()">${n}</button>`).join("")}</div>
-<div class="card"><b>📄 Kertas jawaban ${vw}</b>${r ? qs.map((q, i) => `<div class="q">${i + 1}. ${esc(q.text)}<br><b style="color:var(--p2)">→ ${esc(r.ans[q.id] || "—")}</b></div>`).join("") + `<button class="btn g" style="margin-top:10px" onclick="delResp('${vw}')">🗑 Hapus jawaban ${vw}</button>` : `<p class="m">${vw} belum ngisi ⏳</p>`}</div>
+<script>
+// ====== ISI: URL Web App dari Apps Script ======
+const API="https://script.google.com/macros/s/AKfycbwmN1wMzMxWvtUOcPshViTvmAeX3kOGZE1uWTE2YERvWlt9WHLg8tAE1iNed6SG8C0/exec";
+// ===============================================
+const LOCAL=API.startsWith("PASTE");
+const NAMES=["Ocha","Jiji","Rara","Wini"];
+const SAMPLE=["Siapa yang paling mungkin telat datang ke staycation?","Siapa yang paling mungkin bangun paling siang?","Siapa yang paling mungkin nikah duluan?","Siapa yang paling mungkin balikan sama ex?","Siapa yang paling mungkin survive zombie apocalypse?","Siapa yang paling mungkin jadi villain kalau kita masuk reality show?","Siapa yang paling delulu?","Siapa yang paling mungkin jadi tempat curhat semua orang?","Siapa yang paling mungkin tiba-tiba pindah negara?","Siapa yang paling mungkin dateng jam 3 pagi kalau kita butuh bantuan?"];
+let page="menu",KEY=sessionStorage.getItem("wk")||"",inited=false,isOwner=false,showLogin=false,qs=[],resp=[],tab=0,slide=0,revealed={},spinning=null,mine={who:"",ans:{}},done=false,copied=false;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const app=()=>$("#app");
+function tally(id){const t={};NAMES.forEach(n=>t[n]=0);resp.forEach(r=>{const c=r.ans&&r.ans[id];if(c in t)t[c]++});return t}
+function totals(){const t={};NAMES.forEach(n=>t[n]=0);qs.forEach(q=>{const x=tally(q.id);NAMES.forEach(n=>t[n]+=x[n])});return t}
+function bars(t){const mx=Math.max(1,...Object.values(t));return `<div class="rs">${NAMES.map(n=>`<div class="row"><span>${n}</span><div class="bar"><i style="width:${t[n]/mx*100}%"></i></div><b>${t[n]}</b></div>`).join("")}</div>`}
+function setTtl(p){$("#ttl").textContent={menu:"🎀 Staycation Hub 🎀",quiz:"🎀 Who's Most Likely To 🎀",rundown:"🗓 Rundown 🗓",content:"💡 Content Ideas 💡"}[p]}
+const back=`<button class="btn g" style="margin-bottom:10px" onclick="page='menu';render()">← Menu</button>`;
+function menuHTML(){
+ const it=RD.days.reduce((a,d)=>a+d.items.length,0),dn=CI.filter(x=>x.done).length;
+ return `<div class="menu"><button class="mi" onclick="page='quiz';render()"><b>🎰 Who's Most Likely To</b><div>${qs.length} pertanyaan · ${resp.length} jawaban masuk</div></button>
+<button class="mi" onclick="page='rundown';render()"><b>🗓 Rundown</b><div>${RD.days.length} hari · ${it} kegiatan</div></button>
+<button class="mi" onclick="page='content';render()"><b>💡 Content Ideas</b><div>${dn}/${CI.length} udah dibuat</div></button></div>`}
+/* ---- Rundown ---- */
+let RD=JSON.parse(localStorage.getItem("rd")||"null")||{days:[{id:"d1",label:"Hari 1",start:"09:00",items:[]}]};
+function saveRD(){localStorage.setItem("rd",JSON.stringify(RD));render()}
+const hm=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
+const setDay=(i,k,v)=>{RD.days[i][k]=v;saveRD()};
+const addDay=()=>{RD.days.push({id:"d"+Date.now(),label:"Hari "+(RD.days.length+1),start:"09:00",items:[]});saveRD()};
+const delDay=i=>{if(confirm("Hapus hari ini beserta kegiatannya?")){RD.days.splice(i,1);saveRD()}};
+const addItem=i=>{RD.days[i].items.push({id:"i"+Date.now(),t:"",dur:60,note:""});saveRD()};
+const setItem=(i,j,k,v)=>{RD.days[i].items[j][k]=k==="dur"?Math.max(0,parseInt(v)||0):v;saveRD()};
+const mvItem=(i,j,d)=>{const a=RD.days[i].items,k=j+d;if(k<0||k>=a.length)return;[a[j],a[k]]=[a[k],a[j]];saveRD()};
+const delItem=(i,j)=>{RD.days[i].items.splice(j,1);saveRD()};
+function rundownHTML(){
+ return back+RD.days.map((d,i)=>{const [h,m]=(d.start||"00:00").split(":").map(Number);let cur=h*60+m;
+  const rows=d.items.map((it,j)=>{const st=cur;cur+=it.dur;return `<div class="rd"><div class="row"><span class="tm">${hm(st)}–${hm(cur)}</span><input class="nm" type="number" min="0" step="5" value="${it.dur}" onchange="setItem(${i},${j},'dur',this.value)"><span class="m">mnt</span><span style="flex:1"></span><button class="ic" onclick="mvItem(${i},${j},-1)">↑</button><button class="ic" onclick="mvItem(${i},${j},1)">↓</button><button class="ic" onclick="delItem(${i},${j})">🗑</button></div><input placeholder="Kegiatan…" value="${esc(it.t)}" onchange="setItem(${i},${j},'t',this.value)"><input placeholder="Catatan (opsional)" value="${esc(it.note)}" onchange="setItem(${i},${j},'note',this.value)"></div>`}).join("");
+  return `<div class="card"><div class="row"><input value="${esc(d.label)}" onchange="setDay(${i},'label',this.value)"><button class="ic" onclick="delDay(${i})">🗑</button></div><div class="row m">Mulai jam <input type="time" style="width:auto" value="${esc(d.start)}" onchange="setDay(${i},'start',this.value)"></div>${rows}<div class="row" style="margin-top:10px"><button class="btn g" onclick="addItem(${i})">+ Kegiatan</button><span class="m">${d.items.length?"Selesai ±"+hm(cur):""}</span></div></div>`}).join("")+`<button class="btn" style="width:100%" onclick="addDay()">+ Tambah hari</button><p class="m" style="text-align:center">Jam otomatis dihitung dari jam mulai + durasi tiap kegiatan 🌸</p>`}
+/* ---- Content ideas ---- */
+let CI=JSON.parse(localStorage.getItem("ci")||"[]"),cf="all",zm="";
+function saveCI(){try{localStorage.setItem("ci",JSON.stringify(CI))}catch(e){alert("Penyimpanan browser penuh, hapus beberapa foto dulu ya");return false}render();return true}
+const ci=id=>CI.find(x=>x.id===id);
+const setCI=(id,k,v)=>{ci(id)[k]=v;saveCI()};
+function addIdea(){const t=$("#nt").value.trim();if(!t)return;CI.unshift({id:"c"+Date.now(),title:t,link:$("#nl").value.trim(),note:"",done:false,photos:[]});saveCI()}
+const delIdea=id=>{if(confirm("Hapus ide ini?")){CI=CI.filter(x=>x.id!==id);saveCI()}};
+const delPh=(id,k)=>{ci(id).photos.splice(k,1);saveCI()};
+const zoom=(id,k)=>{zm=ci(id).photos[k];render()};
+function addPhotos(id,files){[...files].forEach(f=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const sc=Math.min(1,720/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*sc;c.height=im.height*sc;c.getContext("2d").drawImage(im,0,0,c.width,c.height);const o=ci(id);if(!o)return;o.photos.push(c.toDataURL("image/jpeg",.6));if(!saveCI())o.photos.pop()};im.src=r.result};r.readAsDataURL(f)})}
+const lnk=l=>/^https?:\/\//i.test(l)?l:"https://"+l;
+function contentHTML(){
+ const list=CI.filter(x=>cf==="all"||(cf==="done")===x.done);
+ return back+`<div class="card"><input id="nt" placeholder="Judul ide konten…" onkeydown="if(event.key==='Enter')addIdea()"><input id="nl" placeholder="Link referensi (opsional)" onkeydown="if(event.key==='Enter')addIdea()"><button class="btn" style="margin-top:6px" onclick="addIdea()">+ Tambah ide</button></div>
+<div class="tabs">${[["all","Semua"],["todo","Belum"],["done","Udah ✓"]].map(([k,l])=>`<button class="tab ${cf==k?"on":""}" onclick="cf='${k}';render()">${l}</button>`).join("")}</div>
+${list.length?list.map(x=>`<div class="card ${x.done?"done":""}"><label class="row" style="font-weight:700"><input type="checkbox" style="width:22px;height:22px;margin:0" ${x.done?"checked":""} onchange="setCI('${x.id}','done',this.checked)"><span class="tt" style="flex:1">${esc(x.title)}</span><button class="ic" type="button" onclick="event.preventDefault();delIdea('${x.id}')">🗑</button></label>
+<input placeholder="Link" value="${esc(x.link)}" onchange="setCI('${x.id}','link',this.value.trim())">${x.link?`<a href="${esc(lnk(x.link))}" target="_blank" rel="noopener" class="m">🔗 buka link</a>`:""}
+<input placeholder="Catatan" value="${esc(x.note)}" onchange="setCI('${x.id}','note',this.value)">
+${x.photos.length?`<div class="ph">${x.photos.map((u,k)=>`<div><img src="${u}" onclick="zoom('${x.id}',${k})"><button onclick="delPh('${x.id}',${k})">✕</button></div>`).join("")}</div>`:""}
+<label class="up">📷 Tambah foto<input type="file" accept="image/*" multiple hidden onchange="addPhotos('${x.id}',this.files);this.value=''"></label></div>`).join(""):`<div class="card">Belum ada ide di sini 🌸</div>`}
+<p class="m" style="text-align:center">${CI.filter(x=>x.done).length}/${CI.length} udah dibuat</p>`+(zm?`<div class="zm" onclick="zm='';render()"><img src="${zm}"></div>`:"")}
+function render(){
+ if(isOwner&&page!=="quiz"){setTtl(page);app().innerHTML=({menu:menuHTML,rundown:rundownHTML,content:contentHTML})[page]()+(LOCAL?"":`<button class="lock" onclick="logout()">keluar 🔒</button>`);return}
+ if(isOwner){setTtl("quiz");const T=["✏️ Pertanyaan","🔗 Share","📄 Jawaban","🎰 Hasil","✨ Summary",...(LOCAL?["📝 Isi Form"]:[])];
+  app().innerHTML=`<button class="btn g" style="margin-bottom:10px" onclick="page='menu';render()">← Menu</button><div class="tabs">${T.map((t,i)=>`<button class="tab ${tab==i?"on":""}" onclick="tab=${i};render()">${t}</button>`).join("")}</div>`+[tabQ,tabShare,tabAns,tabSlides,tabSum,guestHTML][tab]()+(LOCAL?"":`<button class="lock" onclick="logout()">keluar 🔒</button>`);return}
+ if(showLogin){app().innerHTML=`<div class="card"><b>Login admin 🔒</b><input id="pw" type="password" placeholder="password admin" onkeydown="if(event.key==='Enter')login()"><div class="row" style="margin-top:8px"><button class="btn" onclick="login()">Masuk</button><button class="btn g" onclick="showLogin=false;render()">Batal</button></div></div>`;return}
+ renderGuest();
+}
+function lockBtn(){return `<button class="lock" onclick="showLogin=true;render()">🔒</button>`}
+const api=q=>fetch(API+"?"+q).then(r=>r.json());
+const post=async d=>{const r=await(await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(d)})).json();if(r.error)throw new Error(r.error);return r};
+async function login(){const k=$("#pw").value;const r=await api("action=responses&key="+encodeURIComponent(k)).catch(()=>({error:"net"}));if(r.error)return alert("Password salah / koneksi gagal");KEY=k;sessionStorage.setItem("wk",k);isOwner=true;showLogin=false;resp=r.responses;render()}
+function logout(){KEY="";sessionStorage.removeItem("wk");isOwner=false;render()}
+function save(list){if(LOCAL){qs=list.map(q=>({id:q.id,text:q.text}));localStorage.setItem("wq",JSON.stringify(qs));render();return}qs=list.map(q=>({id:q.id,text:q.text}));render();return post({action:"setQuestions",key:KEY,questions:qs}).catch(e=>alert("Gagal simpan: "+e.message))}
+async function pull(){try{const a=document.activeElement,typing=a&&a.tagName==="INPUT";let ch=!inited;
+ const q=await api("action=questions");if(JSON.stringify(q.questions)!==JSON.stringify(qs.map(x=>({id:x.id,text:x.text})))){qs=q.questions;ch=true}
+ if(isOwner){const r=await api("action=responses&key="+encodeURIComponent(KEY));if(r.responses&&JSON.stringify(r.responses)!==JSON.stringify(resp)){resp=r.responses;ch=true}}
+ if(ch&&!typing){inited=true;render()}}catch(e){if(!inited){inited=true;render()}}}
+function tabQ(){return `<div class="card"><b>Pilihan jawaban (fix):</b> <span class="m">${NAMES.join(" · ")}</span><div class="row" style="margin-top:8px"><input id="nq" placeholder="Siapa yang paling mungkin…" onkeydown="if(event.key==='Enter')addQ()"><button class="btn" onclick="addQ()">Tambah</button></div></div>
+<div class="card">${qs.length?qs.map((q,i)=>`<div class="q row"><span style="flex:1">${i+1}. ${esc(q.text)}</span><button class="btn g" onclick="delQ(${i})">🗑</button></div>`).join(""):`<p class="m">Belum ada pertanyaan.</p><button class="btn" onclick="seed()">Isi contoh 10 pertanyaan</button>`}</div>`}
+function addQ(){const v=$("#nq").value.trim();if(v)save([...qs,{id:"q"+Date.now(),text:v}])}
+function delQ(i){if(confirm("Hapus pertanyaan ini?"))save(qs.filter((_,j)=>j!==i))}
+function seed(){save(SAMPLE.map((t,i)=>({id:"q"+Date.now()+i,text:t})))}
+let vw="";
+async function delResp(who){
+ if(!confirm(who?`Hapus jawaban ${who}?`:"Hapus SEMUA jawaban?"))return;
+ if(LOCAL){const r=JSON.parse(localStorage.getItem("wr")||"{}");if(who)delete r[who];else Object.keys(r).forEach(k=>delete r[k]);localStorage.setItem("wr",JSON.stringify(r));resp=Object.values(r)}
+ else{try{await post({action:"deleteResponses",key:KEY,who:who||null});resp=who?resp.filter(r=>r.who!==who):[]}catch(e){return alert("Gagal hapus: "+e.message)}}
+ revealed={};render()}
+function tabAns(){
+ if(!resp.length)return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
+ if(!vw)vw=resp[0].who;
+ const r=resp.find(x=>x.who==vw);
+ return `<div class="tabs" style="margin-top:12px">${NAMES.map(n=>`<button class="tab ${vw==n?"on":""}" style="${resp.some(x=>x.who==n)?"":"opacity:.45"}" onclick="vw='${n}';render()">${n}</button>`).join("")}</div>
+<div class="card"><b>📄 Kertas jawaban ${vw}</b>${r?qs.map((q,i)=>`<div class="q">${i+1}. ${esc(q.text)}<br><b style="color:var(--p2)">→ ${esc(r.ans[q.id]||"—")}</b></div>`).join("")+`<button class="btn g" style="margin-top:10px" onclick="delResp('${vw}')">🗑 Hapus jawaban ${vw}</button>`:`<p class="m">${vw} belum ngisi ⏳</p>`}</div>
 <button class="btn g" style="width:100%" onclick="delResp()">🗑 Hapus SEMUA jawaban</button>`}
-        function tabShare() {
-            if (LOCAL) return `<div class="card"><b>Mode lokal 🌸</b><p class="m">Data cuma tersimpan di browser ini (belum sync antar device). Sync dipasang nanti.</p></div><div class="card"><b>Status pengisian</b>${NAMES.map(n => `<div class="q">${resp.some(r => r.who == n) ? "✅" : "⏳"} ${n}</div>`).join("")}<button class="btn g" style="margin-top:10px" onclick="delResp()">Hapus semua jawaban (test)</button></div>`; const url = location.href.split("#")[0]; return `<div class="card"><b>Link buat temen 💌</b><input readonly value="${esc(url)}" onclick="this.select()"><p class="m">Kirim link ini. Temen cuma lihat form, tanpa login. Jawaban cuma kebaca kalau kamu login admin.</p></div>
-<div class="card"><b>Status pengisian</b>${NAMES.map(n => `<div class="q">${resp.some(r => r.who == n) ? "✅" : "⏳"} ${n}</div>`).join("")}</div>`
-        }
-        function tabSlides() {
-            const n = qs.length + 2; if (!resp.length || !qs.length) return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
-            slide = Math.max(0, Math.min(slide, n - 1)); let b;
-            if (slide == 0) b = `<div style="font-size:54px">🎀🎰🎀</div><h2>Who's Most Likely To…</h2><div class="m">${qs.length} pertanyaan · ${resp.length} voters<br>Siap-siap kena tuduh 😭</div>`;
-            else if (slide == n - 1) { const t = totals(), o = [...NAMES].sort((a, b) => t[b] - t[a]); b = `<h2>🏆 Paling banyak ditunjuk</h2><div class="big">${o[0]}</div>${bars(t)}` }
-            else {
-                const q = qs[slide - 1], t = tally(q.id), mx = Math.max(...Object.values(t)), w = NAMES.filter(x => t[x] == mx && mx > 0);
-                b = `<div class="m">Pertanyaan ${slide}/${qs.length}</div><h2>${esc(q.text)}</h2>` + (spinning === q.id ? `<div class="spin" id="sp">🎰</div>` : revealed[q.id] ? `<div class="big">${w.join(" & ") || "—"} 🎉</div>${bars(t)}<button class="btn g" onclick="spin('${q.id}')">🔄 Putar ulang</button>` : `<button class="btn" onclick="spin('${q.id}')">🎰 Putar!</button>`)
-            }
-            return `<div class="slide">${b}</div><div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn g" onclick="slide--;render()">← Prev</button><span class="m">${slide + 1}/${n}</span><button class="btn" onclick="slide++;render()">Next →</button></div>`
-        }
-        function spin(id) { spinning = id; render(); let k = 0; const iv = setInterval(() => { const e = $("#sp"); if (e) e.textContent = NAMES[k++ % 4]; if (k > 26) { clearInterval(iv); spinning = null; revealed[id] = true; render() } }, 45) }
-        function topQs(n) { return qs.map(q => [q.text, tally(q.id)[n]]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3) }
-        function short(t) { return esc(t.replace(/^Siapa yang paling mungkin /, "").replace(/\?$/, "")) }
-        const EM = { Ocha: "🌸", Jiji: "🎀", Rara: "🍓", Wini: "🦋" };
-        function badge(q) { const m = q.text.match(/paling (mungkin )?(.*?)\??$/i); return m ? `Si Paling ${m[1] ? "Mungkin " : ""}${m[2]}` : q.text }
-        function tabSum() {
-            if (!resp.length || !qs.length) return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
-            const t = totals(), o = [...NAMES].sort((a, b) => t[b] - t[a]), V = resp.length;
-            const info = qs.map(q => { const x = tally(q.id), mx = Math.max(...Object.values(x)); return { q, mx, w: NAMES.filter(n => x[n] == mx && mx > 0) } });
-            const aw = {}; NAMES.forEach(n => aw[n] = info.filter(i => i.w.length == 1 && i.w[0] == n).sort((a, b) => b.mx - a.mx).slice(0, 3));
-            const self = NAMES.filter(n => resp.some(r => r.who == n)).map(n => { const r = resp.find(x => x.who == n); return [n, qs.filter(q => r.ans[q.id] == n).length] }).sort((a, b) => b[1] - a[1]);
-            const kompak = [...info].sort((a, b) => b.mx - a.mx)[0], debat = [...info].sort((a, b) => a.mx - b.mx)[0];
-            const fav = resp.map(r => { const c = {}; qs.forEach(q => { const a = r.ans[q.id]; if (a && a != r.who) c[a] = (c[a] || 0) + 1 }); const e = Object.entries(c).sort((a, b) => b[1] - a[1])[0]; return e ? `${EM[r.who] || ""} ${r.who} paling sering nunjuk <b>${e[0]}</b> (${e[1]}×)` : "" }).filter(Boolean);
-            return `<div class="slide" style="min-height:0"><div class="m">👑 Si paling kena tunjuk</div><div class="big">${o[0]} ${EM[o[0]]}</div><div class="m">${t[o[0]]} vote dari ${qs.length} pertanyaan · paling jarang: ${o[3]} (${t[o[3]]}×) 🕊</div>${bars(t)}</div>` +
-                NAMES.map(n => `<div class="card"><div class="row"><span style="font-size:34px">${EM[n]}</span><div><b style="font-size:18px">${n}</b><div class="m">${t[n]} kali ditunjuk</div></div></div>${aw[n].length ? aw[n].map(i => `<div class="q">🏅 <b>${esc(badge(i.q))}</b> <span class="m">(${i.mx}/${V} vote)</span></div>`).join("") : `<div class="q m">Belum ada gelar solo, aman 😌</div>`}</div>`).join("") +
-                `<div class="card"><b>🎭 Fun facts</b>
-${self.length ? `<div class="q">🪞 Paling narsis: <b>${self[0][0]}</b> (milih diri sendiri ${self[0][1]}×)</div>` : ""}
-<div class="q">🤝 Paling kompak: <b>${esc(badge(kompak.q))}</b> → ${kompak.w.join(" & ") || "—"} (${kompak.mx}/${V})</div>
+function tabShare(){if(LOCAL)return `<div class="card"><b>Mode lokal 🌸</b><p class="m">Data cuma tersimpan di browser ini (belum sync antar device). Sync dipasang nanti.</p></div><div class="card"><b>Status pengisian</b>${NAMES.map(n=>`<div class="q">${resp.some(r=>r.who==n)?"✅":"⏳"} ${n}</div>`).join("")}<button class="btn g" style="margin-top:10px" onclick="delResp()">Hapus semua jawaban (test)</button></div>`;const url=location.href.split("#")[0];return `<div class="card"><b>Link buat temen 💌</b><input readonly value="${esc(url)}" onclick="this.select()"><p class="m">Kirim link ini. Temen cuma lihat form, tanpa login. Jawaban cuma kebaca kalau kamu login admin.</p></div>
+<div class="card"><b>Status pengisian</b>${NAMES.map(n=>`<div class="q">${resp.some(r=>r.who==n)?"✅":"⏳"} ${n}</div>`).join("")}</div>`}
+function tabSlides(){
+ const n=qs.length+2;if(!resp.length||!qs.length)return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
+ slide=Math.max(0,Math.min(slide,n-1));let b;
+ if(slide==0)b=`<div style="font-size:54px">🎀🎰🎀</div><h2>Who's Most Likely To…</h2><div class="m">${qs.length} pertanyaan · ${resp.length} voters<br>Siap-siap kena tuduh 😭</div>`;
+ else if(slide==n-1){const t=totals(),o=[...NAMES].sort((a,b)=>t[b]-t[a]);b=`<h2>🏆 Paling banyak ditunjuk</h2><div class="big">${o[0]}</div>${bars(t)}`}
+ else{const q=qs[slide-1],t=tally(q.id),mx=Math.max(...Object.values(t)),w=NAMES.filter(x=>t[x]==mx&&mx>0);
+  b=`<div class="m">Pertanyaan ${slide}/${qs.length}</div><h2>${esc(q.text)}</h2>`+(spinning===q.id?`<div class="spin" id="sp">🎰</div>`:revealed[q.id]?`<div class="big">${w.join(" & ")||"—"} 🎉</div>${bars(t)}<button class="btn g" onclick="spin('${q.id}')">🔄 Putar ulang</button>`:`<button class="btn" onclick="spin('${q.id}')">🎰 Putar!</button>`)}
+ return `<div class="slide">${b}</div><div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn g" onclick="slide--;render()">← Prev</button><span class="m">${slide+1}/${n}</span><button class="btn" onclick="slide++;render()">Next →</button></div>`}
+function spin(id){spinning=id;render();let k=0;const iv=setInterval(()=>{const e=$("#sp");if(e)e.textContent=NAMES[k++%4];if(k>=20){clearInterval(iv);spinning=null;revealed[id]=true;render()}},50)}
+function topQs(n){return qs.map(q=>[q.text,tally(q.id)[n]]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,3)}
+function short(t){return esc(t.replace(/^Siapa yang paling mungkin /,"").replace(/\?$/,""))}
+const EM={Ocha:"🌸",Jiji:"🎀",Rara:"🍓",Wini:"🦋"};
+function badge(q){const m=q.text.match(/paling (mungkin )?(.*?)\??$/i);return m?`Si Paling ${m[1]?"Mungkin ":""}${m[2]}`:q.text}
+function tabSum(){
+ if(!resp.length||!qs.length)return `<div class="card">Belum ada jawaban masuk 🌸</div>`;
+ const t=totals(),o=[...NAMES].sort((a,b)=>t[b]-t[a]),V=resp.length;
+ const info=qs.map(q=>{const x=tally(q.id),mx=Math.max(...Object.values(x));return{q,mx,w:NAMES.filter(n=>x[n]==mx&&mx>0)}});
+ const aw={};NAMES.forEach(n=>aw[n]=info.filter(i=>i.w.length==1&&i.w[0]==n).sort((a,b)=>b.mx-a.mx).slice(0,3));
+ const self=NAMES.filter(n=>resp.some(r=>r.who==n)).map(n=>{const r=resp.find(x=>x.who==n);return[n,qs.filter(q=>r.ans[q.id]==n).length]}).sort((a,b)=>b[1]-a[1]);
+ const kompak=[...info].sort((a,b)=>b.mx-a.mx)[0],debat=[...info].sort((a,b)=>a.mx-b.mx)[0];
+ const fav=resp.map(r=>{const c={};qs.forEach(q=>{const a=r.ans[q.id];if(a&&a!=r.who)c[a]=(c[a]||0)+1});const e=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];return e?`${EM[r.who]||""} ${r.who} paling sering nunjuk <b>${e[0]}</b> (${e[1]}×)`:""}).filter(Boolean);
+ return `<div class="slide" style="min-height:0"><div class="m">👑 Si paling kena tunjuk</div><div class="big">${o[0]} ${EM[o[0]]}</div><div class="m">${t[o[0]]} vote dari ${qs.length} pertanyaan · paling jarang: ${o[3]} (${t[o[3]]}×) 🕊</div>${bars(t)}</div>`+
+ NAMES.map(n=>`<div class="card"><div class="row"><span style="font-size:34px">${EM[n]}</span><div><b style="font-size:18px">${n}</b><div class="m">${t[n]} kali ditunjuk</div></div></div>${aw[n].length?aw[n].map(i=>`<div class="q">🏅 <b>${esc(badge(i.q))}</b> <span class="m">(${i.mx}/${V} vote)</span></div>`).join(""):`<div class="q m">Belum ada gelar solo, aman 😌</div>`}</div>`).join("")+
+ `<div class="card"><b>🎭 Fun facts</b>
+${self.length?`<div class="q">🪞 Paling narsis: <b>${self[0][0]}</b> (milih diri sendiri ${self[0][1]}×)</div>`:""}
+<div class="q">🤝 Paling kompak: <b>${esc(badge(kompak.q))}</b> → ${kompak.w.join(" & ")||"—"} (${kompak.mx}/${V})</div>
 <div class="q">⚔️ Paling bikin debat: <b>${esc(badge(debat.q))}</b> (suara kepecah)</div>
-${fav.length ? `<div class="q">💘 Siapa nunjuk siapa:<br>${fav.join("<br>")}</div>` : ""}</div>
-<div class="card"><b>AI summary 🤖</b><p class="m">Halaman ini nggak bisa panggil AI langsung. Klik tombol, lalu tempel ke Claude/ChatGPT buat dapet summary kepribadian tiap orang.</p><button class="btn" onclick="copyPrompt()">${copied ? "Tersalin ✅" : "Salin prompt"}</button></div>`
-        }
-        function copyPrompt() {
-            const data = qs.map(q => ({ pertanyaan: q.text, vote: tally(q.id) }));
-            const p = `Kamu bikin summary lucu untuk 4 sahabat: ${NAMES.join(", ")}. Ini hasil voting "who's most likely to" (jumlah vote per nama per pertanyaan): ${JSON.stringify(data)}. Tulis dalam bahasa Indonesia santai, hangat, sedikit savage tapi sayang: 2-3 kalimat kepribadian tiap orang berdasarkan pola vote, plus 4-5 fun fact (siapa paling sering ditunjuk, hasil paling mengejutkan, vote paling mepet).`;
-            navigator.clipboard.writeText(p).then(() => { copied = true; render(); setTimeout(() => { copied = false; render() }, 2000) }, () => prompt("Salin manual:", p))
-        }
-        function renderGuest() { app().innerHTML = guestHTML() + lockBtn() }
-        let step = 0;
-        function setWho(x) { mine.who = x; render(); setTimeout(() => { if (step === 0) { step = 1; render(); scrollTo(0, 0) } }, 220) }
-        function pick(q, n) { mine.ans[q] = n; render(); const s0 = step; setTimeout(() => { if (step === s0) { step++; render(); scrollTo(0, 0) } }, 220) }
-        function guestHTML() {
-            if (done) return `<div class="card" style="text-align:center"><div style="font-size:48px">💖</div><h2>Makasih udah isi!</h2><p class="m">Jawabanmu rahasia sampai staycation 🤫</p><button class="btn g" onclick="done=false;step=1;render()">Edit jawaban</button>${LOCAL ? ` <button class="btn" onclick="mine={who:'',ans:{}};done=false;step=0;render()">Isi untuk orang lain</button>` : ""}</div>`;
-            if (!qs.length) return `<div class="card">Pertanyaannya belum siap 🌸</div>`;
-            const n = qs.length, bar = `<div class="bar" style="margin:0 0 14px"><i style="width:${Math.min(step, n + 1) / (n + 1) * 100}%"></i></div>`;
-            if (step <= 0) return bar + `<div class="card"><b style="font-size:18px">Kamu siapa? 🌸</b><div class="opts">${NAMES.map(x => `<button class="opt ${mine.who == x ? "on" : ""}" onclick="setWho('${x}')">${x}</button>`).join("")}</div></div>`;
-            if (step > n) return bar + `<div class="card" style="text-align:center"><div style="font-size:44px">🎀</div><b>Semua udah dijawab!</b><p class="m">Siap dikirim?</p><button class="btn g" onclick="step=${n};render()">← Balik</button> <button class="btn" onclick="submit()">Kirim 💌</button></div>`;
-            const q = qs[step - 1];
-            return bar + `<div class="m" style="text-align:center">Pertanyaan ${step}/${n}</div><div class="card"><b style="font-size:18px">${esc(q.text)}</b><div class="opts">${NAMES.map(x => `<button class="opt ${mine.ans[q.id] == x ? "on" : ""}" onclick="pick('${q.id}','${x}')">${x}</button>`).join("")}</div></div><button class="btn g" onclick="step--;render()">← Back</button>`
-        }
-        async function submit() {
-            if (!mine.who) { step = 0; render(); return alert("Pilih namamu dulu ya") }
-            const m = qs.findIndex(q => !mine.ans[q.id]); if (m >= 0) { step = m + 1; render(); return alert("Ada yang belum dijawab") }
-            try { if (LOCAL) { const r = JSON.parse(localStorage.getItem("wr") || "{}"); r[mine.who] = { who: mine.who, ans: mine.ans, ts: Date.now() }; localStorage.setItem("wr", JSON.stringify(r)); resp = Object.values(r) } else await post({ action: "submit", who: mine.who, ans: mine.ans }); done = true; render(); scrollTo(0, 0) } catch (e) { alert("Gagal kirim: " + e.message) }
-        }
-        if (LOCAL) { isOwner = true; qs = JSON.parse(localStorage.getItem("wq") || "[]"); resp = Object.values(JSON.parse(localStorage.getItem("wr") || "{}")); render() }
-        else (async () => { if (KEY) { const r = await api("action=responses&key=" + encodeURIComponent(KEY)).catch(() => ({})); isOwner = !!r.responses; if (isOwner) resp = r.responses } await pull(); render(); setInterval(pull, 8000) })();
-    </script>
-</body>
-
-</html>
+${fav.length?`<div class="q">💘 Siapa nunjuk siapa:<br>${fav.join("<br>")}</div>`:""}</div>
+<div class="card"><b>AI summary 🤖</b><p class="m">Halaman ini nggak bisa panggil AI langsung. Klik tombol, lalu tempel ke Claude/ChatGPT buat dapet summary kepribadian tiap orang.</p><button class="btn" onclick="copyPrompt()">${copied?"Tersalin ✅":"Salin prompt"}</button></div>`}
+function copyPrompt(){
+ const data=qs.map(q=>({pertanyaan:q.text,vote:tally(q.id)}));
+ const p=`Kamu bikin summary lucu untuk 4 sahabat: ${NAMES.join(", ")}. Ini hasil voting "who's most likely to" (jumlah vote per nama per pertanyaan): ${JSON.stringify(data)}. Tulis dalam bahasa Indonesia santai, hangat, sedikit savage tapi sayang: 2-3 kalimat kepribadian tiap orang berdasarkan pola vote, plus 4-5 fun fact (siapa paling sering ditunjuk, hasil paling mengejutkan, vote paling mepet).`;
+ navigator.clipboard.writeText(p).then(()=>{copied=true;render();setTimeout(()=>{copied=false;render()},2000)},()=>prompt("Salin manual:",p))}
+function renderGuest(){setTtl("quiz");app().innerHTML=guestHTML()+lockBtn()}
+let step=0;
+function setWho(x){mine.who=x;render();setTimeout(()=>{if(step===0){step=1;render();scrollTo(0,0)}},220)}
+function pick(q,n){mine.ans[q]=n;render();const s0=step;setTimeout(()=>{if(step===s0){step++;render();scrollTo(0,0)}},220)}
+function guestHTML(){
+ if(done)return `<div class="card" style="text-align:center"><div style="font-size:48px">💖</div><h2>Makasih udah isi!</h2><p class="m">Jawabanmu rahasia sampai staycation 🤫</p><button class="btn g" onclick="done=false;step=1;render()">Edit jawaban</button>${LOCAL?` <button class="btn" onclick="mine={who:'',ans:{}};done=false;step=0;render()">Isi untuk orang lain</button>`:""}</div>`;
+ if(!qs.length)return `<div class="card">Pertanyaannya belum siap 🌸</div>`;
+ const n=qs.length,bar=`<div class="bar" style="margin:0 0 14px"><i style="width:${Math.min(step,n+1)/(n+1)*100}%"></i></div>`;
+ if(step<=0)return bar+`<div class="card"><b style="font-size:18px">Kamu siapa? 🌸</b><div class="opts">${NAMES.map(x=>`<button class="opt ${mine.who==x?"on":""}" onclick="setWho('${x}')">${x}</button>`).join("")}</div></div>`;
+ if(step>n)return bar+`<div class="card" style="text-align:center"><div style="font-size:44px">🎀</div><b>Semua udah dijawab!</b><p class="m">Siap dikirim?</p><button class="btn g" onclick="step=${n};render()">← Balik</button> <button class="btn" onclick="submit()">Kirim 💌</button></div>`;
+ const q=qs[step-1];
+ return bar+`<div class="m" style="text-align:center">Pertanyaan ${step}/${n}</div><div class="card"><b style="font-size:18px">${esc(q.text)}</b><div class="opts">${NAMES.map(x=>`<button class="opt ${mine.ans[q.id]==x?"on":""}" onclick="pick('${q.id}','${x}')">${x}</button>`).join("")}</div></div><button class="btn g" onclick="step--;render()">← Back</button>`}
+async function submit(){
+ if(!mine.who){step=0;render();return alert("Pilih namamu dulu ya")}
+ const m=qs.findIndex(q=>!mine.ans[q.id]);if(m>=0){step=m+1;render();return alert("Ada yang belum dijawab")}
+ try{if(LOCAL){const r=JSON.parse(localStorage.getItem("wr")||"{}");r[mine.who]={who:mine.who,ans:mine.ans,ts:Date.now()};localStorage.setItem("wr",JSON.stringify(r));resp=Object.values(r)}else await post({action:"submit",who:mine.who,ans:mine.ans});done=true;render();scrollTo(0,0)}catch(e){alert("Gagal kirim: "+e.message)}}
+if(LOCAL){isOwner=true;qs=JSON.parse(localStorage.getItem("wq")||"[]");resp=Object.values(JSON.parse(localStorage.getItem("wr")||"{}"));render()}
+else(async()=>{if(KEY){const r=await api("action=responses&key="+encodeURIComponent(KEY)).catch(()=>({}));isOwner=!!r.responses;if(isOwner)resp=r.responses}await pull();render();setInterval(pull,8000)})();
+</script></body></html>
