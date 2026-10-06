@@ -53,12 +53,12 @@ td{padding:8px;border-top:1px solid var(--line);vertical-align:top}
 
 <script>
 // ====== ISI: URL Web App dari Apps Script ======
-const API="https://script.google.com/macros/s/AKfycby_gaTcKm_qvm_ahY0MHCazY5f3UGY2odHxdsc18UwQjBsdBfz-sClDEu6eMve2uZU/exec";
+const API="https://script.google.com/macros/s/AKfycbwmN1wMzMxWvtUOcPshViTvmAeX3kOGZE1uWTE2YERvWlt9WHLg8tAE1iNed6SG8C0/exec";
 // ===============================================
 const LOCAL=API.startsWith("PASTE");
 const NAMES=["Ocha","Jiji","Rara","Wini"];
-const SAMPLE=["Siapa yang paling mungkin telat datang ke staycation?","Siapa yang paling mungkin bangun paling siang?","Siapa yang paling mungkin nikah duluan?","Siapa yang paling mungkin balikan sama ex?","Siapa yang paling mungkin survive zombie apocalypse?","Siapa yang paling mungkin jadi villain kalau kita masuk reality show?","Siapa yang paling delulu?","Siapa yang paling mungkin jadi tempat curhat semua orang?","Siapa yang paling mungkin tiba-tiba pindah negara?","Siapa yang paling mungkin dateng jam 3 pagi kalau kita butuh bantuan?"];
-let page="menu",KEY=sessionStorage.getItem("wk")||"",inited=false,isOwner=false,showLogin=false,qs=[],resp=[],tab=0,slide=0,revealed={},spinning=null,mine={who:"",ans:{}},done=false,copied=false;
+const SAMPLE=["Siapa yang paling mungkin telat datang ke staycation?", "Siapa yang paling mungkin bangun paling siang?", "Siapa yang paling mungkin ngabisin makanan orang lain?", "Siapa yang paling mungkin lupa bawa barang penting?", "Siapa yang paling mungkin overpacking?", "Siapa yang paling mungkin ketiduran duluan?", "Siapa yang paling mungkin jadi orang terakhir yang ngajak pulang?", "Siapa yang paling mungkin tiba-tiba ngajak aktivitas random jam 2 pagi?", "Siapa yang paling mungkin beli sesuatu cuma karena lucu?", "Siapa yang paling organized?", "Siapa yang paling chaotic?", "Siapa yang paling gampang panik?", "Siapa yang paling keras kepala?", "Siapa yang paling sensitif?", "Siapa yang paling blak-blakan?", "Siapa yang paling susah ambil keputusan?", "Siapa yang paling bisa dipercaya jaga rahasia?", "Siapa yang paling mungkin balikan sama ex?", "Siapa yang paling mungkin stalking ex diam-diam?", "Siapa yang paling mungkin fall in love cuma gara-gara eye contact?", "Siapa yang paling mungkin punya crush tapi denial?", "Siapa yang paling mungkin ghosting orang?", "Siapa yang paling mungkin nikah duluan?", "Siapa yang paling mungkin jadi single paling lama?", "Siapa yang paling mungkin punya secret admirer?", "Siapa yang paling mungkin tiba-tiba punya pasangan tanpa pernah cerita?", "Siapa yang paling mungkin survive zombie apocalypse?", "Siapa yang paling mungkin ditangkap polisi karena alasan bodoh?", "Siapa yang paling mungkin jadi famous?", "Siapa yang paling mungkin tiba-tiba pindah negara?", "Siapa yang paling mungkin jadi crazy rich?", "Siapa yang paling mungkin kehilangan HP saat jalan-jalan?", "Siapa yang paling mungkin nyasar walaupun pakai Google Maps?", "Siapa yang paling mungkin makan makanan yang sudah expired?", "Siapa yang paling mungkin adopt 5 kucing?", "Siapa yang paling mungkin jadi villain kalau kita masuk reality show?", "Siapa yang paling delulu?", "Siapa yang paling main character?", "Siapa yang paling mysterious?", "Siapa yang paling mungkin diam-diam judging semua orang?", "Siapa yang paling mungkin bilang “aku gapapa” padahal jelas nggak?", "Siapa yang paling mungkin overthink chat “ok”?", "Siapa yang paling mungkin jadi tempat curhat semua orang?", "Siapa yang paling mungkin ingat ulang tahun semua orang?", "Siapa yang paling mungkin datang kalau kita butuh bantuan jam 3 pagi?", "Siapa yang paling mungkin jadi “mom friend”?", "Siapa yang paling mungkin ngajak reunion 10 tahun lagi?", "Kalau kita jadi girl group, siapa leader-nya?", "Kalau kita buka bisnis bareng, siapa yang bikin bisnisnya bangkrut?", "Kalau kita tinggal serumah, siapa yang paling cepat bikin orang lain naik darah?", "Kalau kita terdampar di pulau, siapa yang paling mungkin memimpin?", "Siapa yang paling bersyukur kamu kenal?"];
+let page="menu",KEY=sessionStorage.getItem("wk")||"",inited=false,loaded=false,loadErr="",isOwner=false,showLogin=false,qs=[],resp=[],tab=0,slide=0,revealed={},spinning=null,mine={who:"",ans:{}},done=false,copied=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const app=()=>$("#app");
@@ -126,9 +126,11 @@ function cTable(){
 const rundownHTML=()=>back+sw(rv,"rv")+(rv==="tbl"?rdTable():rdEdit());
 const contentHTML=()=>back+sw(cv,"cv")+(upl?`<p class="m" style="text-align:center">⏳ Mengunggah ${upl} foto…</p>`:"")+(cv==="tbl"?cTable():cEdit())+zmHTML();
 const zmHTML=()=>zm?`<div class="zm" onclick="zm='';render()"><img src="${zm}"></div>`:"";
-async function loadBoard(){const b=await api("action=board");if(b.rundown&&b.rundown.days)RD=b.rundown;if(Array.isArray(b.content)&&(b.content.length||!CI.length))CI=b.content}
+function applyBoard(b){const a=JSON.stringify([RD,CI]);if(b.rundown&&b.rundown.days)RD=b.rundown;if(Array.isArray(b.content)&&(b.content.length||!CI.length||!isOwner))CI=b.content;const c=JSON.stringify([RD,CI])!==a;if(c){try{localStorage.setItem("rd",JSON.stringify(RD));localStorage.setItem("ci",JSON.stringify(CI))}catch(e){}}return c}
+async function loadBoard(){applyBoard(await api("action=board"))}
 const setViews=()=>{rv=RD.days.some(d=>d.items.length)?"tbl":"edit";cv=CI.length?"tbl":"edit"};
-function render(){
+function render(){render0();if(loadErr)app().insertAdjacentHTML("afterbegin",`<div class="card" style="border-color:#ff7eb6">⚠️ ${esc(loadErr)}<br><button class="btn g" style="margin-top:8px" onclick="loadErr='';loaded=false;render();pull()">Coba lagi</button></div>`)}
+function render0(){
  if(isOwner&&page!=="quiz"){setTtl(page);app().innerHTML=({menu:menuHTML,rundown:rundownHTML,content:contentHTML})[page]()+(LOCAL?"":`<button class="lock" onclick="logout()">keluar 🔒</button>`);return}
  if(isOwner){setTtl("quiz");const T=["✏️ Pertanyaan","🔗 Share","📄 Jawaban","🎰 Hasil","✨ Summary",...(LOCAL?["📝 Isi Form"]:[])];
   app().innerHTML=`<button class="btn g" style="margin-bottom:10px" onclick="page='menu';render()">← Menu</button><div class="tabs">${T.map((t,i)=>`<button class="tab ${tab==i?"on":""}" onclick="tab=${i};render()">${t}</button>`).join("")}</div>`+[tabQ,tabShare,tabAns,tabSlides,tabSum,guestHTML][tab]()+(LOCAL?"":`<button class="lock" onclick="logout()">keluar 🔒</button>`);return}
@@ -136,21 +138,33 @@ function render(){
  renderGuest();
 }
 function lockBtn(){return `<button class="lock" onclick="showLogin=true;render()">🔒</button>`}
-const api=q=>fetch(API+"?"+q).then(r=>r.json());
-const post=async d=>{const r=await(await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(d)})).json();if(r.error)throw new Error(r.error);return r};
+const J=async r=>{const t=await r.text();try{return JSON.parse(t)}catch(e){throw new Error("Apps Script balas halaman HTML, bukan data. Cek: deployment Web app harus 'Anyone' dan sudah Deploy → New version.")}};
+const F=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,{...o,signal:c.signal}).catch(e=>{throw new Error(e.name==="AbortError"?"Server kelamaan merespon (timeout)":"Gagal konek ke server")}).finally(()=>clearTimeout(t))};
+const api=q=>F(API+"?"+q).then(J);
+const post=async d=>{const r=await F(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(d)}).then(J);if(r.error)throw new Error(r.error==="unknown"?"Apps Script masih versi lama: Deploy → Manage deployments → New version":r.error);return r};
 async function login(){const k=$("#pw").value;const r=await api("action=responses&key="+encodeURIComponent(k)).catch(()=>({error:"net"}));if(r.error)return alert("Password salah / koneksi gagal");KEY=k;sessionStorage.setItem("wk",k);isOwner=true;showLogin=false;resp=r.responses;await loadBoard().catch(()=>{});setViews();page="menu";render()}
 function logout(){page="menu";KEY="";sessionStorage.removeItem("wk");isOwner=false;render()}
 function save(list){if(LOCAL){qs=list.map(q=>({id:q.id,text:q.text}));localStorage.setItem("wq",JSON.stringify(qs));render();return}qs=list.map(q=>({id:q.id,text:q.text}));render();return post({action:"setQuestions",key:KEY,questions:qs}).catch(e=>alert("Gagal simpan: "+e.message))}
-async function pull(){try{const a=document.activeElement,typing=a&&a.tagName==="INPUT";let ch=!inited;
- const q=await api("action=questions");if(JSON.stringify(q.questions)!==JSON.stringify(qs.map(x=>({id:x.id,text:x.text})))){qs=q.questions;ch=true}
- if(!isOwner){const a0=JSON.stringify([RD,CI]);await loadBoard();if(a0!==JSON.stringify([RD,CI]))ch=true}
- if(isOwner){const r=await api("action=responses&key="+encodeURIComponent(KEY));if(r.responses&&JSON.stringify(r.responses)!==JSON.stringify(resp)){resp=r.responses;ch=true}}
- if(ch&&!typing){inited=true;render()}}catch(e){if(!inited){inited=true;render()}}}
-function tabQ(){return `<div class="card"><b>Pilihan jawaban (fix):</b> <span class="m">${NAMES.join(" · ")}</span><div class="row" style="margin-top:8px"><input id="nq" placeholder="Siapa yang paling mungkin…" onkeydown="if(event.key==='Enter')addQ()"><button class="btn" onclick="addQ()">Tambah</button></div></div>
-<div class="card">${qs.length?qs.map((q,i)=>`<div class="q row"><span style="flex:1">${i+1}. ${esc(q.text)}</span><button class="btn g" onclick="delQ(${i})">🗑</button></div>`).join(""):`<p class="m">Belum ada pertanyaan.</p><button class="btn" onclick="seed()">Isi contoh 10 pertanyaan</button>`}</div>`}
+async function pull(){try{const a=document.activeElement,typing=a&&a.tagName==="INPUT";let ch=!loaded;
+ const [q,b,r]=await Promise.all([api("action=questions"),api("action=board"),KEY?api("action=responses&key="+encodeURIComponent(KEY)).catch(()=>null):null]);
+ if(b.error)throw new Error(b.error==="unknown"?"Apps Script masih versi lama: Deploy → Manage deployments → New version":b.error);
+ if(r&&r.responses){if(!isOwner){isOwner=true;ch=true}if(JSON.stringify(r.responses)!==JSON.stringify(resp)){resp=r.responses;ch=true}}
+ else if(r&&r.error==="auth"){KEY="";sessionStorage.removeItem("wk");if(isOwner){isOwner=false;ch=true}}
+ if(JSON.stringify(q.questions)!==JSON.stringify(qs.map(x=>({id:x.id,text:x.text})))){qs=q.questions;try{localStorage.setItem("qc",JSON.stringify(qs))}catch(e){}ch=true}
+ if((!isOwner||!loaded)&&applyBoard(b)){ch=true;if(isOwner)setViews()}
+ if(loadErr){loadErr="";ch=true}
+ loaded=true;if(ch&&!typing)render()}catch(e){loadErr=e.message;loaded=true;render()}}
+let bankOpen=false;
+function tabQ(){
+ const have=new Set(qs.map(q=>q.text)),bank=SAMPLE.map((t,i)=>[t,i]).filter(x=>!have.has(x[0]));
+ return `<div class="card"><b>Pilihan jawaban (fix):</b> <span class="m">${NAMES.join(" · ")}</span><div class="row" style="margin-top:8px"><input id="nq" placeholder="Siapa yang paling mungkin…" onkeydown="if(event.key==='Enter')addQ()"><button class="btn" onclick="addQ()">Tambah</button></div></div>
+<div class="card">${qs.length?qs.map((q,i)=>`<div class="q row"><span class="m">${i+1}.</span><input value="${esc(q.text)}" onchange="editQ(${i},this.value)"><button class="btn g" onclick="delQ(${i})">🗑</button></div>`).join("")+`<p class="m">Ketuk teks pertanyaan buat edit langsung.</p>`:`<p class="m">Belum ada pertanyaan.</p>`}</div>
+<details class="card" ${bankOpen?"open":""} ontoggle="bankOpen=this.open"><summary><b>💡 Bank pertanyaan</b> <span class="m">(${bank.length} contoh)</span></summary>${bank.length?`<button class="btn" style="margin:10px 0" onclick="seed()">+ Tambah semua (${bank.length})</button>`+bank.map(([t,i])=>`<div class="q row"><span style="flex:1">${esc(t)}</span><button class="ic" onclick="addBank(${i})">+</button></div>`).join(""):`<p class="m">Semua contoh sudah ditambahkan 🌸</p>`}</details>`}
+function editQ(i,v){v=v.trim();if(!v)return render();qs[i].text=v;save(qs)}
+function addBank(i){save([...qs,{id:"q"+Date.now(),text:SAMPLE[i]}])}
 function addQ(){const v=$("#nq").value.trim();if(v)save([...qs,{id:"q"+Date.now(),text:v}])}
 function delQ(i){if(confirm("Hapus pertanyaan ini?"))save(qs.filter((_,j)=>j!==i))}
-function seed(){save(SAMPLE.map((t,i)=>({id:"q"+Date.now()+i,text:t})))}
+function seed(){const have=new Set(qs.map(q=>q.text));save([...qs,...SAMPLE.filter(t=>!have.has(t)).map((t,i)=>({id:"q"+Date.now()+"_"+i,text:t}))])}
 let vw="";
 async function delResp(who){
  if(!confirm(who?`Hapus jawaban ${who}?`:"Hapus SEMUA jawaban?"))return;
@@ -206,7 +220,7 @@ function setWho(x){mine.who=x;render();setTimeout(()=>{if(step===0){step=1;rende
 function pick(q,n){mine.ans[q]=n;render();const s0=step;setTimeout(()=>{if(step===s0){step++;render();scrollTo(0,0)}},220)}
 function guestHTML(){
  if(done)return `<div class="card" style="text-align:center"><div style="font-size:48px">💖</div><h2>Makasih udah isi!</h2><p class="m">Jawabanmu rahasia sampai staycation 🤫</p><button class="btn g" onclick="done=false;step=1;render()">Edit jawaban</button>${LOCAL?` <button class="btn" onclick="mine={who:'',ans:{}};done=false;step=0;render()">Isi untuk orang lain</button>`:""}</div>`;
- if(!qs.length)return `<div class="card">Pertanyaannya belum siap 🌸</div>`;
+ if(!qs.length)return `<div class="card">${loaded?"Pertanyaannya belum siap 🌸":"Memuat… 🌸 (pertama kali bisa 5–10 detik)"}</div>`;
  const n=qs.length,bar=`<div class="bar" style="margin:0 0 14px"><i style="width:${Math.min(step,n+1)/(n+1)*100}%"></i></div>`;
  if(step<=0)return bar+`<div class="card"><b style="font-size:18px">Kamu siapa? 🌸</b><div class="opts">${NAMES.map(x=>`<button class="opt ${mine.who==x?"on":""}" onclick="setWho('${x}')">${x}</button>`).join("")}</div></div>`;
  if(step>n)return bar+`<div class="card" style="text-align:center"><div style="font-size:44px">🎀</div><b>Semua udah dijawab!</b><p class="m">Siap dikirim?</p><button class="btn g" onclick="step=${n};render()">← Balik</button> <button class="btn" onclick="submit()">Kirim 💌</button></div>`;
@@ -217,5 +231,5 @@ async function submit(){
  const m=qs.findIndex(q=>!mine.ans[q.id]);if(m>=0){step=m+1;render();return alert("Ada yang belum dijawab")}
  try{if(LOCAL){const r=JSON.parse(localStorage.getItem("wr")||"{}");r[mine.who]={who:mine.who,ans:mine.ans,ts:Date.now()};localStorage.setItem("wr",JSON.stringify(r));resp=Object.values(r)}else await post({action:"submit",who:mine.who,ans:mine.ans});done=true;render();scrollTo(0,0)}catch(e){alert("Gagal kirim: "+e.message)}}
 if(LOCAL){isOwner=true;qs=JSON.parse(localStorage.getItem("wq")||"[]");resp=Object.values(JSON.parse(localStorage.getItem("wr")||"{}"));render()}
-else(async()=>{if(KEY){const r=await api("action=responses&key="+encodeURIComponent(KEY)).catch(()=>({}));isOwner=!!r.responses;if(isOwner){resp=r.responses;await loadBoard().catch(()=>{});setViews()}}await pull();render();setInterval(pull,8000)})();
+else{try{qs=JSON.parse(localStorage.getItem("qc")||"[]")}catch(e){}loaded=qs.length>0;render();pull().then(()=>setInterval(pull,8000))}
 </script></body></html>
