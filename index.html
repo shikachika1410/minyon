@@ -139,15 +139,18 @@ function render0(){
 }
 function lockBtn(){return `<button class="lock" onclick="showLogin=true;render()">🔒</button>`}
 const J=async r=>{const t=await r.text();try{return JSON.parse(t)}catch(e){throw new Error("Apps Script balas halaman HTML, bukan data. Cek: deployment Web app harus 'Anyone' dan sudah Deploy → New version.")}};
-const F=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,{...o,signal:c.signal}).catch(e=>{throw new Error(e.name==="AbortError"?"Server kelamaan merespon (timeout)":"Gagal konek ke server")}).finally(()=>clearTimeout(t))};
-const api=q=>F(API+"?"+q).then(J);
+const F=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),30000);return fetch(u,{...o,signal:c.signal}).catch(e=>{throw new Error(e.name==="AbortError"?"Server kelamaan merespon (timeout)":"Gagal konek ke server")}).finally(()=>clearTimeout(t))};
+const api=q=>F(API+"?"+q).catch(()=>F(API+"?"+q)).then(J);
 const post=async d=>{const r=await F(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(d)}).then(J);if(r.error)throw new Error(r.error==="unknown"?"Apps Script masih versi lama: Deploy → Manage deployments → New version":r.error);return r};
 async function login(){const k=$("#pw").value;const r=await api("action=responses&key="+encodeURIComponent(k)).catch(()=>({error:"net"}));if(r.error)return alert("Password salah / koneksi gagal");KEY=k;sessionStorage.setItem("wk",k);isOwner=true;showLogin=false;resp=r.responses;await loadBoard().catch(()=>{});setViews();page="menu";render()}
 function logout(){page="menu";KEY="";sessionStorage.removeItem("wk");isOwner=false;render()}
 function save(list){if(LOCAL){qs=list.map(q=>({id:q.id,text:q.text}));localStorage.setItem("wq",JSON.stringify(qs));render();return}qs=list.map(q=>({id:q.id,text:q.text}));render();return post({action:"setQuestions",key:KEY,questions:qs}).catch(e=>alert("Gagal simpan: "+e.message))}
+let busy=false;
+async function tick(){if(busy||document.hidden)return;busy=true;try{await pull()}finally{busy=false}}
 async function pull(){try{const a=document.activeElement,typing=a&&a.tagName==="INPUT";let ch=!loaded;
- const [q,b,r]=await Promise.all([api("action=questions"),api("action=board"),KEY?api("action=responses&key="+encodeURIComponent(KEY)).catch(()=>null):null]);
+ const b=await api("action=all"+(KEY?"&key="+encodeURIComponent(KEY):""));
  if(b.error)throw new Error(b.error==="unknown"?"Apps Script masih versi lama: Deploy → Manage deployments → New version":b.error);
+ const q=b,r=b.responses?{responses:b.responses}:(b.auth?{error:"auth"}:null);
  if(r&&r.responses){if(!isOwner){isOwner=true;ch=true}if(JSON.stringify(r.responses)!==JSON.stringify(resp)){resp=r.responses;ch=true}}
  else if(r&&r.error==="auth"){KEY="";sessionStorage.removeItem("wk");if(isOwner){isOwner=false;ch=true}}
  if(JSON.stringify(q.questions)!==JSON.stringify(qs.map(x=>({id:x.id,text:x.text})))){qs=q.questions;try{localStorage.setItem("qc",JSON.stringify(qs))}catch(e){}ch=true}
@@ -231,5 +234,5 @@ async function submit(){
  const m=qs.findIndex(q=>!mine.ans[q.id]);if(m>=0){step=m+1;render();return alert("Ada yang belum dijawab")}
  try{if(LOCAL){const r=JSON.parse(localStorage.getItem("wr")||"{}");r[mine.who]={who:mine.who,ans:mine.ans,ts:Date.now()};localStorage.setItem("wr",JSON.stringify(r));resp=Object.values(r)}else await post({action:"submit",who:mine.who,ans:mine.ans});done=true;render();scrollTo(0,0)}catch(e){alert("Gagal kirim: "+e.message)}}
 if(LOCAL){isOwner=true;qs=JSON.parse(localStorage.getItem("wq")||"[]");resp=Object.values(JSON.parse(localStorage.getItem("wr")||"{}"));render()}
-else{try{qs=JSON.parse(localStorage.getItem("qc")||"[]")}catch(e){}loaded=qs.length>0;render();pull().then(()=>setInterval(pull,8000))}
+else{try{qs=JSON.parse(localStorage.getItem("qc")||"[]")}catch(e){}loaded=qs.length>0;render();tick().then(()=>setInterval(tick,15000));document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick()})}
 </script></body></html>
