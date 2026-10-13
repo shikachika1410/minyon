@@ -53,8 +53,9 @@ td{padding:8px;border-top:1px solid var(--line);vertical-align:top}
 .cbl{display:none;position:absolute;left:0;right:0;top:100%;z-index:5;background:#fff;border:2px solid var(--line);border-radius:14px;max-height:190px;overflow:auto;box-shadow:0 8px 20px #ffb6d33a;margin-top:4px}
 .cbl div{padding:9px 14px;cursor:pointer;text-align:left}.cbl div:hover{background:var(--soft)}.cbl .nw{color:var(--p2);font-weight:700}
 .md{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:8}
-.chip{display:inline-block;background:var(--soft);border-radius:999px;padding:3px 10px;margin:2px 2px 4px 0;font-size:13px}
-.chip b{cursor:pointer;margin-left:4px;color:var(--mut)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border-radius:999px;padding:3px 10px;margin:2px 2px 4px 0;font-size:13px}
+.chip b{cursor:pointer;color:var(--mut)}
+.tw .ic{width:30px;height:30px}
 </style></head><body><div class="w"><h1 id="ttl">🎀 Who's Most Likely To 🎀</h1><div id="app" style="text-align:center" class="m">Loading… 🌸</div></div>
 
 <script>
@@ -93,7 +94,7 @@ function rdEdit(){
  return RD.days.map((d,i)=>{const [h,m]=(d.start||"00:00").split(":").map(Number);let cur=h*60+m;
   const rows=d.items.map((it,j)=>{const st=cur;cur+=it.dur;
    const chips=cidsOf(it).map(id=>{const c=CI.find(x=>x.id===id);return c?`<span class="chip">${catEm(c)} ${esc(c.title)} <b onclick="rmCid(${i},${j},'${id}')">✕</b></span>`:""}).join("");
-   return `<tr><td><span class="tm">${hm(st)}–${hm(cur)}</span></td><td><input class="nm" type="number" min="0" step="5" value="${it.dur}" onchange="setItem(${i},${j},'dur',this.value)"></td><td><input style="min-width:170px" placeholder="Kegiatan…" value="${esc(it.t)}" onchange="setItem(${i},${j},'t',this.value)"></td><td style="min-width:200px">${chips}<div class="cb"><input id="rc_${i}_${j}" data-i="${i}" data-j="${j}" autocomplete="off" placeholder="+ pilih content" oninput="cpSug(this)" onfocus="cpSug(this)" onblur="setTimeout(cbHide,200)"><div class="cbl" id="rc_${i}_${j}_l"></div></div></td><td style="white-space:nowrap"><button class="ic" onclick="mvItem(${i},${j},-1)">↑</button> <button class="ic" onclick="mvItem(${i},${j},1)">↓</button> <button class="ic" onclick="delItem(${i},${j})">🗑</button></td></tr>`}).join("");
+   return `<tr><td><span class="tm">${hm(st)}–${hm(cur)}</span></td><td><input class="nm" type="number" min="0" step="5" value="${it.dur}" onchange="setItem(${i},${j},'dur',this.value)"></td><td><input style="min-width:140px" placeholder="Kegiatan…" value="${esc(it.t)}" onchange="setItem(${i},${j},'t',this.value)"></td><td style="min-width:170px">${chips}<div class="cb"><input id="rc_${i}_${j}" data-i="${i}" data-j="${j}" autocomplete="off" placeholder="+ pilih content" oninput="cpSug(this)" onfocus="cpSug(this)" onblur="setTimeout(cbHide,200)"><div class="cbl" id="rc_${i}_${j}_l"></div></div></td><td style="white-space:nowrap"><button class="ic" onclick="mvItem(${i},${j},-1)">↑</button> <button class="ic" onclick="mvItem(${i},${j},1)">↓</button> <button class="ic" onclick="delItem(${i},${j})">🗑</button></td></tr>`}).join("");
   return `<div class="card"><div class="row"><input value="${esc(d.label)}" onchange="setDay(${i},'label',this.value)"><button class="ic" onclick="delDay(${i})">🗑</button></div><div class="row m">Mulai jam <input type="time" style="width:auto" value="${esc(d.start)}" onchange="setDay(${i},'start',this.value)"></div><div class="tw"><table style="min-width:600px"><tr><th>Jam</th><th>Mnt</th><th>Kegiatan</th><th>Content</th><th></th></tr>${rows}</table></div><div class="row" style="margin-top:10px"><button class="btn g" onclick="addItem(${i})">+ Kegiatan</button><span class="m">${d.items.length?"Selesai ±"+hm(cur):""}</span></div></div>`}).join("")+`<button class="btn" style="width:100%" onclick="addDay()">+ Tambah hari</button><p class="m" style="text-align:center">Jam otomatis dihitung dari jam mulai + durasi 🌸</p>`}
 /* ---- Content ideas ---- */
 let CI=JSON.parse(localStorage.getItem("ci")||"[]"),cf="all",zm="";
@@ -152,10 +153,10 @@ const cidsOf=it=>it.cids||(it.cid?[it.cid]:[]);
 const cLink=it=>cidsOf(it).map(id=>CI.find(x=>x.id===id)).filter(Boolean).map(c=>`<a href="#" onclick="cm='${c.id}';render();return false">${catEm(c)} ${esc(c.title)}</a>${c.done?" ✓":""}`).join("<br>")||"—";
 const addCid=(i,j,id)=>{const it=RD.days[i].items[j];it.cids=[...cidsOf(it).filter(x=>x!==id),id];delete it.cid;saveRD()};
 const rmCid=(i,j,id)=>{const it=RD.days[i].items[j];it.cids=cidsOf(it).filter(x=>x!==id);delete it.cid;saveRD()};
-function cpSug(inp){const i=+inp.dataset.i,j=+inp.dataset.j,have=cidsOf(RD.days[i].items[j]),q=inp.value.trim().toLowerCase();
- const m=CI.filter(c=>!have.includes(c.id)&&(!q||c.title.toLowerCase().includes(q)||catName(c).toLowerCase().includes(q))).slice(0,40);
+function cpSug(inp){const i=+inp.dataset.i,j=+inp.dataset.j,used=new Set(RD.days.flatMap(d=>d.items.flatMap(cidsOf))),q=inp.value.trim().toLowerCase();
+ const m=CI.filter(c=>!used.has(c.id)&&(!q||c.title.toLowerCase().includes(q)||catName(c).toLowerCase().includes(q))).slice(0,40);
  const box=$("#"+inp.id+"_l"),r=inp.getBoundingClientRect();
- box.innerHTML=m.map(c=>`<div onpointerdown="cpPick(event,${i},${j},'${c.id}')">${catEm(c)} ${esc(c.title)}${catName(c)?` <span class="m">· ${esc(catName(c))}</span>`:""}</div>`).join("")||`<div class="m">${CI.length?"Tidak ada yang cocok":"Belum ada content idea"}</div>`;
+ box.innerHTML=m.map(c=>`<div onpointerdown="cpPick(event,${i},${j},'${c.id}')">${catEm(c)} ${esc(c.title)}${catName(c)?` <span class="m">· ${esc(catName(c))}</span>`:""}</div>`).join("")||`<div class="m">${!CI.length?"Belum ada content idea":q?"Tidak ada yang cocok":"Semua content sudah dipakai di rundown ✓"}</div>`;
  Object.assign(box.style,{display:"block",position:"fixed",left:r.left+"px",top:(r.bottom+4)+"px",width:Math.max(r.width,230)+"px"})}
 function cpPick(e,i,j,id){e.preventDefault();cbHide();addCid(i,j,id)}
 addEventListener("scroll",e=>{if(!(e.target.classList&&e.target.classList.contains("cbl")))cbHide()},true);
